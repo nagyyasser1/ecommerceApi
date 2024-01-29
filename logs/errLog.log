@@ -1,0 +1,8 @@
+2023/11/29 16:28:58	2d899eec-bc5a-4366-a1cd-4e7e555fbd11	ReferenceError: username is not defined	POST	/api/user	undefined
+2023/12/14 09:31:09	6f540f68-f838-4d0d-b036-d065b91eaec7	Error: Cannot find module 'html'
+Require stack:
+- D:\real-world-projects\e-commerce\api\node_modules\express\lib\view.js
+- D:\real-world-projects\e-commerce\api\node_modules\express\lib\application.js
+- D:\real-world-projects\e-commerce\api\node_modules\express\lib\express.js
+- D:\real-world-projects\e-commerce\api\node_modules\express\index.js
+- D:\real-world-projects\e-commerce\api\server.js	GET	/addproduct	undefined

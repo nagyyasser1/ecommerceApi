@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nodejs FileUpload</title>
+</head>
+<style>
+    body {
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 1.5rem;
+        background-color: #333;
+        color: whitesmoke;
+    }
+
+    input,
+    button {
+        font: inherit;
+        width: max-content;
+    }
+
+    form {
+        display: flex;
+        flex-flow: column nowrap;
+        gap: 1.5rem;
+    }
+</style>
+
+<body>
+    <h1>Node.js File Uploader</h1>
+    <form id="uploadForm">
+        <label for="productName">Product Name:</label>
+        <input type="text" id="productName" name="productName" required />
+
+        <label for="productDescription">Product Description:</label>
+        <textarea id="productDescription" name="productDescription"></textarea>
+
+        <label for="productPrice">Product Price:</label>
+        <input type="number" id="productPrice" name="productPrice" step="0.01" required />
+
+        <label for="productStockQuantity">Stock Quantity:</label>
+        <input type="number" id="productStockQuantity" name="productStockQuantity" required />
+
+        <label for="productCategory">Product Category:</label>
+        <input type="text" id="productCategory" name="productCategory" required />
+
+        <label for="productManufacturer">Product Manufacturer:</label>
+        <input type="text" id="productManufacturer" name="productManufacturer" required />
+
+        <input type="file" id="myFiles" accept="image/*" multiple />
+        <button>Submit</button>
+    </form>
+    <h2></h2>
+    <h3></h3>
+    <script>
+        const form = document.getElementById('uploadForm')
+
+        const sendFiles = async () => {
+            const productName = document.getElementById('productName').value
+            const productDescription = document.getElementById('productDescription').value
+            const productPrice = document.getElementById('productPrice').value
+            const productStockQuantity = document.getElementById('productStockQuantity').value
+            const productCategory = document.getElementById('productCategory').value
+            const productManufacturer = document.getElementById('productManufacturer').value
+
+            const myFiles = document.getElementById('myFiles').files
+
+            const formData = new FormData()
+
+            // Append product details
+            formData.append('name', productName)
+            formData.append('description', productDescription)
+            formData.append('price', productPrice)
+            formData.append('stockQuantity', productStockQuantity)
+            formData.append('categoryId', productCategory)
+            formData.append('manufacturerId', productManufacturer)
+
+            // Append files
+            Object.keys(myFiles).forEach(key => {
+                formData.append(myFiles.item(key).name, myFiles.item(key))
+            })
+
+            const response = await fetch('http://localhost:3000/api/products', {
+                method: 'POST',
+                body: formData
+            })
+
+            const json = await response.json()
+
+            const h2 = document.querySelector('h2')
+            h2.textContent = `Status: ${json?.status}`
+
+            const h3 = document.querySelector('h3')
+            h3.textContent = json?.message
+
+            console.log(json)
+        }
+
+        form.addEventListener('submit', (e) => {
+            e.preventDefault()
+            sendFiles()
+        })
+    </script>
+</body>
+
+</html>

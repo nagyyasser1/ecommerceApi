@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>e-Shop API</title>
+
+    <!-- Favicon -->
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f8f8;
+            color: #333;
+        }
+
+        header {
+            background-color: #333;
+            color: #fff;
+            padding: 15px;
+            text-align: center;
+        }
+
+        section {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            border-bottom: 2px solid rosybrown;
+            padding-bottom: 5px;
+            margin-bottom: 15px;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        li {
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        li a {
+            color: rosybrown;
+            text-decoration: none;
+        }
+
+        li a:hover {
+            text-decoration: underline;
+        }
+
+        footer {
+            background-color: #333;
+            color: #fff;
+            padding: 15px;
+            text-align: center;
+        }
+
+        footer ul {
+            padding: 0;
+            list-style: none;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        footer ul li {
+            margin-right: 20px;
+        }
+
+        .contact-link {
+            color: #3498db;
+            text-decoration: none;
+        }
+
+        .contact-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>e-Shop api</h1>
+        <a href="http://localhost:3500/api-docs/" target="_blank"
+            style="color: rosybrown; text-decoration: none;">Swagger Docs</a>
+    </header>
+
+    <section>
+        <h2>USER</h2>
+        <ul>
+            <li>Create an account</li>
+            <li>Login/logout/verify-email</li>
+            <li>Add an address</li>
+            <li>View all products (featured/filtering/search)</li>
+            <li>Write/update/delete a review</li>
+            <li>Place an order</li>
+            <li>View his orders</li>
+            <li>Cancel an order (if status is shipped, it can't be canceled)</li>
+            <li>Create a wishlist / Get own wishlist / Delete it</li>
+            <li>Add / update / delete / get items to card </li>
+            <li>Contact e-shop owner</li>
+        </ul>
+
+        <h2>ADMIN</h2>
+        <ul>
+            <li>Can do everything an ordinary user can</li>
+            <li>Delete/update a user</li>
+            <li>Add/modify/delete a product</li>
+            <li>Delete any review</li>
+            <li>Cancel orders</li>
+            <li>View all orders</li>
+        </ul>
+    </section>
+
+    <footer>
+        <h1>Contact</h1>
+        <ul>
+            <li>
+                <a href="https://www.linkedin.com/in/nagy-yasser-629bab239" target="_blank"
+                    class="contact-link">LinkedIn</a>
+            </li>
+            <li style="color: white;">
+                01094066795
+            </li>
+        </ul>
+    </footer>
+
+    <script>
+        // Add your JavaScript code here if needed
+    </script>
+</body>
+
+</html>
