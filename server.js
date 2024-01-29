@@ -40,7 +40,7 @@ app.all("*", notFound);
 app.use(errorHandler);
 
 // Init db & Run the server
-sequelize.sync({force: true}).then(() => {
+sequelize.sync({alter: true}).then(() => {
   app.listen(PORT, () => {
     console.log(`server runing on port ${PORT}`);
   });

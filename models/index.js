@@ -29,15 +29,25 @@ OrderItem.belongsTo(ProductSize);
 
 // Define Review Associations
 Review.belongsTo(User);
+Review.belongsTo(Product);
 
 // Define Category Associations
 Category.hasMany(Product);
 
 // Define Product Associations
+Product.hasMany(ProductImage);
+Product.hasMany(Review);
 Product.belongsTo(Category);
+Product.belongsToMany(Size, {through: ProductSize});
 
 // Define ProductSize Associations
 ProductSize.hasMany(OrderItem);
+
+// Define Size Associations;
+Size.belongsToMany(Product, {through: ProductSize});
+
+// Define ProductImage Associations
+ProductImage.belongsTo(Product);
 
 module.exports = {
   sequelize,

@@ -11,6 +11,20 @@ module.exports = (sequelize, DataTypes) => {
             allowNull: false,
             defaultValue: 0,
         },
+        ProductId: {
+            type: DataTypes.INTEGER,
+            references: {
+                model: 'Products',
+                key: 'id'
+            }
+        },
+        SizeId: {
+            type: DataTypes.INTEGER,
+            references: {
+                model: 'Sizes',
+                key: 'id'
+            }
+        }
     });
 
     return ProductSize;

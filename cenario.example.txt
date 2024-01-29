@@ -1,0 +1,45 @@
+Scenario: A user named "Alice" orders a blue T-shirt in size "Medium".
+
+User:
+
+    Alice has one Order associated with her.
+    Alice has one Review associated with the T-shirt.
+
+Order:
+
+    The Order belongs to Alice.
+    The Order has one OrderItem, representing the T-shirt.
+
+OrderItem:
+
+    The OrderItem belongs to the Order.
+    The OrderItem belongs to the ProductSize representing "Medium" blue T-shirt.
+
+Review:
+
+    The Review belongs to Alice.
+    The Review belongs to the Product representing the T-shirt.
+
+Product:
+
+    The Product has many ProductImages (potentially showing different angles or colors).
+    The Product has many Reviews (including Alice's).
+    The Product belongs to a Category, such as "Clothing".
+    The Product has a many-to-many relationship with Size, using ProductSize as the junction table.
+
+ProductSize:
+
+    The ProductSize represents the combination of a specific Product and Size.
+    It has many OrderItems associated with it, meaning multiple people have ordered this T-shirt in "Medium".
+
+Category:
+
+    The Category "Clothing" has many Products, including the T-shirt.
+
+Size:
+
+    The Size "Medium" has a many-to-many relationship with Products, as it's available for multiple items.
+
+ProductImage:
+
+    The ProductImage belongs to the Product, showcasing the T-shirt visually.
