@@ -1,5 +1,5 @@
 const asyncHandler = require("express-async-handler");
-const db = require("../models");
+const { sequelize } = require("../models");
 const STATUS_CODES = require("../constants/STATUS_CODES");
 
 // @desc Add new Category
@@ -8,15 +8,9 @@ const STATUS_CODES = require("../constants/STATUS_CODES");
 const addCategory = asyncHandler(async (req, res) => {
   const { categoryName, description } = req.body;
 
-  if (!categoryName || !description) {
-    return res
-      .status(STATUS_CODES.BAD_REQUEST)
-      .json({ message: "All fields are required!" });
-  }
-
   try {
     // Check if the category already exists
-    const existingCategory = await db.Category.findOne({
+    const existingCategory = await sequelize.models.Category.findOne({
       where: {
         categoryName,
       },
@@ -29,14 +23,14 @@ const addCategory = asyncHandler(async (req, res) => {
     }
 
     // Create a new category
-    const newCategory = await db.Category.create({
+    const newCategory = await sequelize.models.Category.create({
       categoryName,
       description,
     });
 
     return res
       .status(STATUS_CODES.CREATED)
-      .json({ message: "Category added successfully", category: newCategory });
+      .json(newCategory);
   } catch (error) {
     console.error("Error adding category:", error);
     return res
@@ -53,7 +47,7 @@ const deleteCategory = asyncHandler(async (req, res) => {
 
   try {
     // Check if the category exists
-    const categoryToDelete = await db.Category.findByPk(categoryId);
+    const categoryToDelete = await sequelize.models.Category.findByPk(categoryId);
 
     if (!categoryToDelete) {
       return res
@@ -78,12 +72,9 @@ const deleteCategory = asyncHandler(async (req, res) => {
 // @access Private
 const getAllCategories = asyncHandler(async (req, res) => {
   try {
-    const categories = await db.Category.findAll();
+    const categories = await sequelize.models.Category.findAll();
 
-    return res.status(STATUS_CODES.SUCCESS).json({
-      message: "Categories retrieved successfully",
-      categories,
-    });
+    return res.status(STATUS_CODES.SUCCESS).send(categories);
   } catch (error) {
     console.error("Error getting all categories:", error);
     return res
@@ -97,7 +88,7 @@ const updateCategory = asyncHandler(async (req, res) => {
 
   try {
     // Check if the category exists
-    const category = await db.Category.findByPk(categoryId);
+    const category = await sequelize.models.Category.finsequelize.modelsyPk(categoryId);
 
     if (!category) {
       return res.status(STATUS_CODES.NOT_FOUND).json({

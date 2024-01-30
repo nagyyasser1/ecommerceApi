@@ -11,6 +11,10 @@ module.exports = (sequelize, DataTypes) => {
             allowNull: false,
             defaultValue: 0,
         },
+        color: {
+            type: DataTypes.STRING,
+            allowNull: false
+        },
         ProductId: {
             type: DataTypes.INTEGER,
             references: {

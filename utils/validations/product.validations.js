@@ -15,17 +15,14 @@ const schema = Joi.object({
     )
 });
 
-const validateProductData = (data) => {
-    const validationResult = schema.validate(data);
+const validateProductData = (req, res, next) => {
+    const validationResult = schema.validate(req.body);
 
     if (validationResult.error) {
-        return {
-            isValid: false,
-            error: validationResult.error.details[0].message
-        };
-    }
+        return res.status(STATUS_CODES.UNPROCESSABLE_ENTITY).send(validationResult.error);
+    };
 
-    return { isValid: true };
+    next();
 };
 
 const sizesExists = async (sizes) => {

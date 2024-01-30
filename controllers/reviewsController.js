@@ -1,19 +1,13 @@
-const db = require("../models");
+const { sequelize } = require("../models");
 const asyncHandler = require("express-async-handler");
 const STATUS_CODES = require("../constants/STATUS_CODES");
 
 const addReview = asyncHandler(async (req, res) => {
-  const { rating, comment, date, productId } = req.body;
-
-  if (!rating || !date || !productId) {
-    return res
-      .status(STATUS_CODES.BAD_REQUEST)
-      .json({ message: "Rating, date, userId, and productId are required!" });
-  }
+  const { rating, comment, productId } = req.body;
 
   try {
     // Check if the product exists
-    const existingProduct = await db.Product.findOne({
+    const existingProduct = await sequelize.models.Product.findOne({
       where: {
         id: productId,
       },
@@ -21,22 +15,21 @@ const addReview = asyncHandler(async (req, res) => {
 
     if (!existingProduct) {
       return res
-        .status(STATUS_CODES.BAD_REQUEST)
+        .status(STATUS_CODES.NOT_FOUND)
         .json({ message: "Product does not exist!" });
     }
 
     // Create a new review
-    const newReview = await db.Review.create({
+    const newReview = await sequelize.models.Review.create({
       rating,
       comment,
-      date,
-      userId: req.user.id,
-      productId,
+      UserId: req.user.id,
+      ProductId: productId,
     });
 
     return res
       .status(STATUS_CODES.CREATED)
-      .json({ message: "Review added successfully", review: newReview });
+      .json(newReview);
   } catch (error) {
     console.error("Error adding new review:", error);
     return res
@@ -57,7 +50,7 @@ const deleteReview = asyncHandler(async (req, res) => {
   }
 
   try {
-    const review = await db.Review.findByPk(reviewId);
+    const review = await sequelize.models.Review.finsequelize.modelsyPk(reviewId);
 
     if (!review) {
       return res
@@ -96,7 +89,7 @@ const updateReview = asyncHandler(async (req, res) => {
   }
 
   try {
-    const review = await db.Review.findByPk(reviewId);
+    const review = await sequelize.models.Review.finsequelize.modelsyPk(reviewId);
 
     if (!review) {
       return res

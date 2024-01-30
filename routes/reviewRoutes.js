@@ -1,6 +1,8 @@
 const reviewsController = require("../controllers/reviewsController");
 const verifyJWT = require("../middlewares/verifyJWT");
 const router = require("express").Router();
+const { validateNewReviewData } = require("../utils/validations/review.validations")
+
 /**
  * @swagger
  * tags:
@@ -72,7 +74,7 @@ const router = require("express").Router();
  *                   type: string
  */
 
-router.post("/", verifyJWT, reviewsController.addReview);
+router.post("/", verifyJWT, validateNewReviewData, reviewsController.addReview);
 
 /**
  * @swagger

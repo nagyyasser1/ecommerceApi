@@ -3,6 +3,7 @@ const router = express.Router();
 const usersController = require("../controllers/usersController");
 const verifyJWT = require("../middlewares/verifyJWT");
 const isAdmin = require("../middlewares/isAdmin");
+const { validateUserRegisterData } = require("../utils/validations/user.validations");
 
 /**
  * @swagger
@@ -50,7 +51,7 @@ const isAdmin = require("../middlewares/isAdmin");
  *             example:
  *               message: Duplicate email
  */
-router.post("/", usersController.createNewUser);
+router.post("/", validateUserRegisterData, usersController.createNewUser);
 
 /**
  * @swagger

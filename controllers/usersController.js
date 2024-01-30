@@ -1,4 +1,4 @@
-const db = require("../models");
+const { sequelize } = require("../models");
 const asyncHandler = require("express-async-handler");
 const STATUS_CODES = require("../constants/STATUS_CODES");
 const transporter = require("../config/transporter");
@@ -8,8 +8,8 @@ const jwt = require("jsonwebtoken");
 // @route GET /users
 // @access Private
 const getAllUsers = asyncHandler(async (req, res) => {
-  // Get all users from DB
-  const users = await db.User.findAll({
+  // Get all users from sequelize.models
+  const users = await sequelize.models.User.findAll({
     attributes: {
       exclude: ["password"], // Excludes the 'password' field from the retrieved data
     },
@@ -31,7 +31,7 @@ const getAllUsers = asyncHandler(async (req, res) => {
 const getUserById = asyncHandler(async (req, res) => {
   const userId = req.params.userId;
 
-  const user = await db.User.findOne({
+  const user = await sequelize.models.User.findOne({
     where: {
       id: userId,
     },
@@ -40,12 +40,12 @@ const getUserById = asyncHandler(async (req, res) => {
     },
     include: [
       {
-        model: db.ShippingAddress,
+        model: sequelize.models.ShippingAddress,
         as: "ShippingAddresses", // Use the alias defined in the ShippingAddress association
         attributes: { exclude: ["createdAt", "updatedAt"] }, // Exclude unnecessary fields
       },
       {
-        model: db.Review,
+        model: sequelize.models.Review,
         as: "Reviews", // Use the alias defined in the ShippingAddress association
         attributes: { exclude: ["createdAt", "updatedAt"] }, // Exclude unnecessary fields
       },
@@ -79,15 +79,8 @@ const getUserById = asyncHandler(async (req, res) => {
 const createNewUser = asyncHandler(async (req, res) => {
   const { email, firstName, lastName, address, phone, password } = req.body;
 
-  // Confirm data
-  if (!password || !email || !phone || !firstName || !lastName || !address) {
-    return res
-      .status(STATUS_CODES.BAD_REQUEST)
-      .json({ message: "All fields are required! {email,firstName,lastName,address,phone,password}" });
-  }
-
   // Check for duplicate username
-  const duplicate = await db.User.findOne({
+  const duplicate = await sequelize.models.User.findOne({
     where: {
       email: email,
     },
@@ -99,7 +92,7 @@ const createNewUser = asyncHandler(async (req, res) => {
       .json({ message: "Duplicate username" });
   }
 
-  const newUser = db.User.build({
+  const newUser = sequelize.models.User.build({
     email,
     firstName,
     lastName,
@@ -135,7 +128,7 @@ const makeUserAdmin = asyncHandler(async (req, res) => {
         .json({ message: "isAdmin must be of type boolean." });
     }
     // Find the user by ID
-    const user = await db.User.findByPk(userId);
+    const user = await sequelize.models.User.finsequelize.modelsyPk(userId);
 
     // If no user found
     if (!user) {
@@ -169,7 +162,7 @@ const deleteUser = asyncHandler(async (req, res) => {
 
   try {
     // Check if the user exists
-    const user = await db.User.findByPk(userId);
+    const user = await sequelize.models.User.finsequelize.modelsyPk(userId);
 
     if (!user) {
       return res
@@ -232,7 +225,7 @@ const verifyEmail = asyncHandler(async (req, res) => {
           .status(STATUS_CODES.FORBIDDEN)
           .json({ message: "Forbidden" });
 
-      const foundUser = await db.User.findOne({
+      const foundUser = await sequelize.models.User.findOne({
         where: {
           email: decoded.email,
         },

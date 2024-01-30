@@ -3,7 +3,7 @@ const asyncHandler = require("express-async-handler");
 const STATUS_CODES = require("../constants/STATUS_CODES");
 const deleteFile = require("../utils/deleteFile");
 const path = require("path");
-const { validateProductData, sizesExists, categoryExists } = require("../utils/product.util");
+const { validateProductData, sizesExists, categoryExists } = require("../utils/validations/product.validations");
 
 // @desc Add New product
 // @route /product
@@ -28,7 +28,7 @@ const addProduct = asyncHandler(async (req, res, next) => {
   try {
 
     // Check If The Specified Category Exists
-    const categoryResult =  categoryExists(categoryId);
+    const categoryResult = categoryExists(categoryId);
 
     if (categoryResult.error) {
       return res
@@ -70,7 +70,8 @@ const addProduct = asyncHandler(async (req, res, next) => {
 const saveFiles = asyncHandler(async (req, res) => {
   try {
     const files = req.files;
-    const productId = req.newProduct.id;
+    const product = req.newProduct;
+    const { id: productId } = product;
 
     const promises = Object.keys(files).map(async (key) => {
       const filepath = path.join(
@@ -99,13 +100,17 @@ const saveFiles = asyncHandler(async (req, res) => {
 
     return res
       .status(STATUS_CODES.CREATED)
-      .json({ message: "Product added successfully", product: req.newProduct });
+      .json(product);
+
   } catch (error) {
+
+    // Destroy product if can't save files
     await db.Product.destroy({
       where: {
         id: req.newProduct.id,
       },
     });
+
     console.error("Error saving files:", error);
     return res
       .status(STATUS_CODES.SERVER_ERROR)

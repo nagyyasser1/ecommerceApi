@@ -6,3 +6,12 @@ Require stack:
 - D:\real-world-projects\e-commerce\api\node_modules\express\lib\express.js
 - D:\real-world-projects\e-commerce\api\node_modules\express\index.js
 - D:\real-world-projects\e-commerce\api\server.js	GET	/addproduct	undefined
+2024/01/30 08:56:17	c4dbeee4-67e7-4297-980a-6d88c335452e	SyntaxError: Unexpected number in JSON at position 92	POST	/api/users	undefined
+2024/01/30 08:56:25	fcda3a23-9351-4e99-9ab6-eb191c086360	ReferenceError: bcrypt is not defined	POST	/api/users	undefined
+2024/01/30 09:33:03	2181d3de-f307-4fcd-8ec5-4f5464577055	ReferenceError: error is not defined	POST	/api/users	undefined
+2024/01/30 09:33:08	57192c1d-672e-47b9-b5bb-c1486ddac31b	ReferenceError: error is not defined	POST	/api/users	undefined
+2024/01/30 10:50:27	29008046-becc-4bb0-a80c-12aef29dbb10	RangeError: Invalid status code: undefined	POST	/api/review	undefined
+2024/01/30 10:53:38	5517985d-ca77-45cd-85af-02161a33afb0	RangeError: Invalid status code: undefined	POST	/api/review	undefined
+2024/01/30 10:54:52	6f079842-9f11-438f-a616-2e03047f19d7	RangeError: Invalid status code: undefined	POST	/api/review	undefined
+2024/01/30 10:55:30	e7c87236-86cc-46a1-9d0f-7fff5d446516	RangeError: Invalid status code: undefined	POST	/api/review	undefined
+2024/01/30 10:56:20	f089513e-bf76-4441-a07b-b253652263dd	RangeError: Invalid status code: undefined	POST	/api/review	undefined

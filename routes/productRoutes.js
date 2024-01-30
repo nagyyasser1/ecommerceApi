@@ -5,6 +5,7 @@ const fileUpload = require("express-fileupload");
 const filePayloadExists = require("../middlewares/filesPayloadExists");
 const fileSizeLimiter = require("../middlewares/fileSizeLimiter");
 const fileExtLimiter = require("../middlewares/fileExtLimiter");
+const { validateProductData } = require("../utils/validations/product.validations");
 
 /**
  * @swagger
@@ -250,6 +251,7 @@ router.post(
   filePayloadExists,
   fileExtLimiter([".png", ".jpg", ".jpeg"]),
   fileSizeLimiter,
+  validateProductData,
   productsController.addProduct,
   productsController.saveFiles
 );

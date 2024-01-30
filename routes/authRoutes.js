@@ -108,7 +108,7 @@ router.post("/", loginLimiter, authController.login);
  *                   example: Forbidden
  */
 
-router.route("/refresh").get(authController.refresh);
+router.get("/refresh",authController.refresh);
 
 /**
  * @swagger

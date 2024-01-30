@@ -1,5 +1,6 @@
 const categoryController = require("../controllers/categoryController");
 const isAdmin = require("../middlewares/isAdmin");
+const { validateNewCategoryData } = require("../utils/validations/category.validations");
 const router = require("express").Router();
 
 /**
@@ -93,7 +94,7 @@ router.get("/", categoryController.getAllCategories);
  *             example:
  *               message: Internal Server Error
  */
-router.post("/", categoryController.addCategory);
+router.post("/", validateNewCategoryData, categoryController.addCategory);
 
 /**
  * @swagger

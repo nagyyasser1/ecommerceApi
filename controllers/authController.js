@@ -1,4 +1,4 @@
-const db = require("../models");
+const { sequelize } = require("../models");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const asyncHandler = require("express-async-handler");
@@ -12,12 +12,12 @@ const login = asyncHandler(async (req, res) => {
 
   if (!email || !password) {
     return res
-      .status(STATUS_CODES.BAD_REQUEST)
+      .status(STATUS_CODES.UNAUTHORIZED)
       .json({ message: "All fields are required! {email , password}" });
   }
 
   // Check for existence email
-  const foundUser = await db.User.findOne({
+  const foundUser = await sequelize.models.User.findOne({
     where: {
       email: email,
     },
@@ -26,7 +26,7 @@ const login = asyncHandler(async (req, res) => {
   if (!foundUser) {
     return res
       .status(STATUS_CODES.NOT_FOUND)
-      .json({ message: "user not found!" });
+      .json({ message: "email or password incorrect!" });
   }
 
   const match = await bcrypt.compare(password, foundUser.password);
@@ -34,7 +34,7 @@ const login = asyncHandler(async (req, res) => {
   if (!match)
     return res
       .status(STATUS_CODES.BAD_REQUEST)
-      .json({ message: "Email or Password not correct!" });
+      .json({ message: "email or password incorrect!" });
 
   const accessToken = jwt.sign(
     {
@@ -92,9 +92,9 @@ const refresh = (req, res) => {
           .status(STATUS_CODES.FORBIDDEN)
           .json({ message: "Forbidden" });
 
-      const foundUser = await db.User.findOne({
+      const foundUser = await sequelize.models.User.findOne({
         where: {
-          email: email,
+          email: decoded.email,
         },
       });
 

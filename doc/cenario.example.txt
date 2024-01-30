@@ -5,7 +5,7 @@ User:
     Alice has one Order associated with her.
     Alice has one Review associated with the T-shirt.
 
-Order:
+Order: 
 
     The Order belongs to Alice.
     The Order has one OrderItem, representing the T-shirt.
