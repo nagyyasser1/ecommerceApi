@@ -1,5 +1,6 @@
 const Joi = require('joi');
-const db = require('../models');
+const { sequelize } = require('../../models');
+const STATUS_CODES = require('../../constants/STATUS_CODES');
 
 const schema = Joi.object({
     name: Joi.string().required(),
@@ -16,59 +17,74 @@ const schema = Joi.object({
 });
 
 const validateProductData = (req, res, next) => {
-    const validationResult = schema.validate(req.body);
+
+    const sizesStr = req.body?.sizes;
+
+    const sizesArr = JSON.parse(sizesStr);
+
+
+    const theNewBody = {...req.body, sizes: sizesArr}
+    
+    const validationResult = schema.validate(theNewBody);
 
     if (validationResult.error) {
         return res.status(STATUS_CODES.UNPROCESSABLE_ENTITY).send(validationResult.error);
     };
 
+    req.body.sizes = sizesArr;
+
     next();
 };
 
-const sizesExists = async (sizes) => {
-
-    const error = []
+const sizesExist = async (sizes) => {
+    const errors = [];
 
     for (const sizeData of sizes) {
         const { sizeId } = sizeData;
 
-        const sizeExists = await db.Size.findOne({
-            where: { sizeId }
-        });
-
+        const sizeExists = await sequelize.models.Size.findByPk(sizeId);
         if (!sizeExists) {
-            error.push(`Size with sizeId '${sizeId}' does not exist in the database.`);
+            errors.push(`Size with sizeId '${sizeId}' does not exist in the database.`);
         }
     }
 
-    if (error.length > 0) {
+    if (errors.length > 0) {
         return {
             isValid: false,
-            error
-        }
+            error: errors
+        };
     }
-
 
     return { isValid: true };
+};
 
-}
 
 const categoryExists = async (categoryId) => {
-    const category = await db.Category.findByPk(categoryId);
-    if (!category) {
+    try {
+        const category = await sequelize.models.Category.findByPk(categoryId);
+
+        if (!category) {
+            return {
+                isValid: false,
+                error: `Category with ID ${categoryId} not found!`
+            };
+        }else{
+            return {
+                isValid: true
+            };
+        }
+
+    } catch (error) {
         return {
             isValid: false,
-            error: `categoryId ${categoryId} not found!`
-        }
+            error: `Error while checking category existence: ${error.message}`
+        };
     }
+};
 
-    return {
-        isValid: true
-    }
-}
 
 module.exports = {
     validateProductData,
-    sizesExists,
+    sizesExist,
     categoryExists
 }

@@ -246,7 +246,7 @@ router.get("/:productId", productsController.getProductById);
 
 router.post(
   "/",
-  isAdmin,
+  // isAdmin,
   fileUpload({ createParentPath: true }),
   filePayloadExists,
   fileExtLimiter([".png", ".jpg", ".jpeg"]),

@@ -1,17 +1,17 @@
-2023/11/29 16:28:58	2d899eec-bc5a-4366-a1cd-4e7e555fbd11	ReferenceError: username is not defined	POST	/api/user	undefined
-2023/12/14 09:31:09	6f540f68-f838-4d0d-b036-d065b91eaec7	Error: Cannot find module 'html'
-Require stack:
-- D:\real-world-projects\e-commerce\api\node_modules\express\lib\view.js
-- D:\real-world-projects\e-commerce\api\node_modules\express\lib\application.js
-- D:\real-world-projects\e-commerce\api\node_modules\express\lib\express.js
-- D:\real-world-projects\e-commerce\api\node_modules\express\index.js
-- D:\real-world-projects\e-commerce\api\server.js	GET	/addproduct	undefined
-2024/01/30 08:56:17	c4dbeee4-67e7-4297-980a-6d88c335452e	SyntaxError: Unexpected number in JSON at position 92	POST	/api/users	undefined
-2024/01/30 08:56:25	fcda3a23-9351-4e99-9ab6-eb191c086360	ReferenceError: bcrypt is not defined	POST	/api/users	undefined
-2024/01/30 09:33:03	2181d3de-f307-4fcd-8ec5-4f5464577055	ReferenceError: error is not defined	POST	/api/users	undefined
-2024/01/30 09:33:08	57192c1d-672e-47b9-b5bb-c1486ddac31b	ReferenceError: error is not defined	POST	/api/users	undefined
-2024/01/30 10:50:27	29008046-becc-4bb0-a80c-12aef29dbb10	RangeError: Invalid status code: undefined	POST	/api/review	undefined
-2024/01/30 10:53:38	5517985d-ca77-45cd-85af-02161a33afb0	RangeError: Invalid status code: undefined	POST	/api/review	undefined
-2024/01/30 10:54:52	6f079842-9f11-438f-a616-2e03047f19d7	RangeError: Invalid status code: undefined	POST	/api/review	undefined
-2024/01/30 10:55:30	e7c87236-86cc-46a1-9d0f-7fff5d446516	RangeError: Invalid status code: undefined	POST	/api/review	undefined
-2024/01/30 10:56:20	f089513e-bf76-4441-a07b-b253652263dd	RangeError: Invalid status code: undefined	POST	/api/review	undefined
+2024/01/30 15:08:27	dd89b5e8-d12c-412f-9a71-d4526cbc820c	Error: ENOENT: no such file or directory, stat '/home/nagy/Desktop/Nodejs/express-practice/e-commerce-apiviewsaddProduct.html'	GET	/add	undefined
+2024/01/30 15:56:42	fdf077b0-3298-4214-8b0e-f16bf2490033	Error: Not allowed by cors!	POST	/api/products	http://localhost:3500
+2024/01/30 15:58:09	8208f0a6-b304-4d44-a107-a7ca49fd3cca	ReferenceError: STATUS_CODES is not defined	POST	/api/products	http://localhost:3500
+2024/01/30 16:46:06	874a178c-ecb2-48fa-b86f-f03a2cb6b285	TypeError: Cannot read properties of undefined (reading 'sizes')	POST	/api/products	http://localhost:3500
+2024/01/30 16:54:11	26d4b4f6-a7ae-4ab7-8406-d73faeac809e	TypeError: Cannot read properties of undefined (reading 'sizes')	POST	/api/products	http://localhost:3500
+2024/01/30 16:54:44	e4da4862-a63a-421c-aa10-ad674ee7672c	TypeError: Cannot read properties of undefined (reading 'sizes')	POST	/api/products	http://localhost:3500
+2024/01/30 16:55:38	9930f964-39db-47b2-82da-11edb4530629	SyntaxError: "undefined" is not valid JSON	POST	/api/products	http://localhost:3500
+2024/01/30 16:57:30	31de7e35-5c93-4d61-8f15-5755eb92fa88	TypeError: Cannot read properties of undefined (reading 'sizes')	POST	/api/products	http://localhost:3500
+2024/01/30 16:58:27	24eb2e07-1726-4095-a77e-c75ae88ae1e5	TypeError: Cannot read properties of undefined (reading 'sizes')	POST	/api/products	http://localhost:3500
+2024/01/30 16:59:33	cf188293-9807-4b42-a604-eef0b48d67fa	TypeError: Cannot read properties of undefined (reading 'sizes')	POST	/api/products	http://localhost:3500
+2024/01/30 17:01:16	ee5da230-686d-4b0c-a21c-a1f3fedd15ad	TypeError: Cannot read properties of undefined (reading 'sizes')	POST	/api/products	http://localhost:3500
+2024/01/30 17:04:23	4fb070ae-013e-4f32-94d7-d76158f738fe	TypeError: Cannot read properties of undefined (reading 'sizes')	POST	/api/products	http://localhost:3500
+2024/01/30 17:05:14	e92ba095-d837-45e6-a171-2a8fdc861fa2	TypeError: Cannot read properties of undefined (reading 'sizes')	POST	/api/products	http://localhost:3500
+2024/01/30 17:06:07	76f738b5-88c2-455d-81b6-e3109e119793	TypeError: Cannot read properties of undefined (reading 'sizes')	POST	/api/products	http://localhost:3500
+2024/01/30 17:07:21	42a30624-e042-492d-9bce-31ae013e11d4	SyntaxError: "undefined" is not valid JSON	POST	/api/products	http://localhost:3500
+2024/01/30 17:08:23	5464e394-b0ca-4d86-b8dc-a8e0f84b830e	SyntaxError: "undefined" is not valid JSON	POST	/api/products	http://localhost:3500
+2024/01/30 17:09:06	76984576-888d-4da5-b2b8-a29847519345	TypeError: Cannot read properties of undefined (reading 'sizes')	POST	/api/products	http://localhost:3500

@@ -39,14 +39,17 @@
         <label for="productPrice">Product Price:</label>
         <input type="number" id="productPrice" name="productPrice" step="0.01" required />
 
-        <label for="productStockQuantity">Stock Quantity:</label>
-        <input type="number" id="productStockQuantity" name="productStockQuantity" required />
-
         <label for="productCategory">Product Category:</label>
         <input type="text" id="productCategory" name="productCategory" required />
 
-        <label for="productManufacturer">Product Manufacturer:</label>
-        <input type="text" id="productManufacturer" name="productManufacturer" required />
+        <label for="sizes">Sizes:</label>
+        <div id="sizesContainer">
+            <div class="sizeInput">
+                <input type="text" class="sizeQuantity" placeholder="Quantity" />
+                <input type="text" class="sizeId" placeholder="Size ID" />
+            </div>
+        </div>
+        <button type="button" onclick="addSizeInput()">Add Size</button>
 
         <input type="file" id="myFiles" accept="image/*" multiple />
         <button>Submit</button>
@@ -54,53 +57,72 @@
     <h2></h2>
     <h3></h3>
     <script>
-        const form = document.getElementById('uploadForm')
+        const form = document.getElementById('uploadForm');
+
+        const addSizeInput = () => {
+            const sizesContainer = document.getElementById('sizesContainer');
+            const sizeInput = document.createElement('div');
+            sizeInput.classList.add('sizeInput');
+            sizeInput.innerHTML = `
+                <input type="text" class="sizeQuantity" placeholder="Quantity" />
+                <input type="text" class="sizeId" placeholder="Size ID" />
+            `;
+            sizesContainer.appendChild(sizeInput);
+        };
 
         const sendFiles = async () => {
-            const productName = document.getElementById('productName').value
-            const productDescription = document.getElementById('productDescription').value
-            const productPrice = document.getElementById('productPrice').value
-            const productStockQuantity = document.getElementById('productStockQuantity').value
-            const productCategory = document.getElementById('productCategory').value
-            const productManufacturer = document.getElementById('productManufacturer').value
+            const productName = document.getElementById('productName').value;
+            const productDescription = document.getElementById('productDescription').value;
+            const productPrice = document.getElementById('productPrice').value;
+            const productCategory = document.getElementById('productCategory').value;
 
-            const myFiles = document.getElementById('myFiles').files
+            const sizesInputs = document.querySelectorAll('.sizeInput');
+            const sizesArray = Array.from(sizesInputs).map((sizeInput) => ({
+                quantity: sizeInput.querySelector('.sizeQuantity').value,
+                sizeId: sizeInput.querySelector('.sizeId').value,
+            }));
 
-            const formData = new FormData()
+            const myFiles = document.getElementById('myFiles').files;
+
+            const formData = new FormData();
 
             // Append product details
-            formData.append('name', productName)
-            formData.append('description', productDescription)
-            formData.append('price', productPrice)
-            formData.append('stockQuantity', productStockQuantity)
-            formData.append('categoryId', productCategory)
-            formData.append('manufacturerId', productManufacturer)
+            formData.append('name', productName);
+            formData.append('description', productDescription);
+            formData.append('price', productPrice);
+            formData.append('categoryId', productCategory);
+            formData.append('isFeatured', true);
+
+            // Append sizes
+            formData.append('sizes', JSON.stringify(sizesArray));
 
             // Append files
-            Object.keys(myFiles).forEach(key => {
-                formData.append(myFiles.item(key).name, myFiles.item(key))
-            })
+            Object.keys(myFiles).forEach((key) => {
+                formData.append(myFiles.item(key).name, myFiles.item(key));
+            });
 
-            const response = await fetch('http://localhost:3000/api/products', {
+            const response = await fetch('http://localhost:3500/api/products', {
                 method: 'POST',
-                body: formData
-            })
+                body: formData,
+            });
 
-            const json = await response.json()
+            const json = await response.json();
 
-            const h2 = document.querySelector('h2')
-            h2.textContent = `Status: ${json?.status}`
+            console.log(response);
+            console.log(json);
+            const h2 = document.querySelector('h2');
+            h2.textContent = `Status: ${response?.status}`;
 
-            const h3 = document.querySelector('h3')
-            h3.textContent = json?.message
+            const h3 = document.querySelector('h3');
+            h3.textContent = response?.statusText;
 
-            console.log(json)
-        }
+            console.log(json);
+        };
 
         form.addEventListener('submit', (e) => {
-            e.preventDefault()
-            sendFiles()
-        })
+            e.preventDefault();
+            sendFiles();
+        });
     </script>
 </body>
 

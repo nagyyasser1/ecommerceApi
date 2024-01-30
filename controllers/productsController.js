@@ -1,20 +1,14 @@
-const db = require("../models");
+const { sequelize } = require("../models");
 const asyncHandler = require("express-async-handler");
 const STATUS_CODES = require("../constants/STATUS_CODES");
 const deleteFile = require("../utils/deleteFile");
 const path = require("path");
-const { validateProductData, sizesExists, categoryExists } = require("../utils/validations/product.validations");
+const { categoryExists, sizesExist } = require("../utils/validations/product.validations");
 
 // @desc Add New product
 // @route /product
 // @access Privit
 const addProduct = asyncHandler(async (req, res, next) => {
-
-  const result = validateProductData(req.body);
-
-  if (result.error) {
-    return res.status(STATUS_CODES.BAD_REQUEST).send(result.error);
-  }
 
   const {
     name,
@@ -28,30 +22,30 @@ const addProduct = asyncHandler(async (req, res, next) => {
   try {
 
     // Check If The Specified Category Exists
-    const categoryResult = categoryExists(categoryId);
+    const categoryResult = await categoryExists(categoryId);
 
-    if (categoryResult.error) {
+    if (!categoryResult.isValid) {
       return res
         .status(STATUS_CODES.NOT_FOUND)
         .send(categoryResult.error);
     }
 
     // Check If The Specified Sizes Exists
-    const sizesResult = sizesExists(sizes);
+    const sizesResult = await sizesExist(sizes);
 
-    if (sizesResult.error) {
+    if (!sizesResult.isValid) {
       return res
         .status(STATUS_CODES.NOT_FOUND)
-        .send(sizesExists.error);
+        .send(sizesResult.error);
     }
 
     //Create New Product
-    const newProduct = await db.Product.create({
+    const newProduct = await sequelize.models.Product.create({
       name,
       description,
       price,
       isFeatured,
-      categoryId,
+      CategoryId: categoryId,
     });
 
     req.newProduct = newProduct;
@@ -86,9 +80,9 @@ const saveFiles = asyncHandler(async (req, res) => {
             console.error(`Error saving file ${files[key].name}:`, err);
             reject({ file: files[key].name, error: err });
           } else {
-            await db.ProductImage.create({
+            await sequelize.models.ProductImage.create({
               imageUrl: productId + files[key].name,
-              productId,
+              ProductId: productId,
             });
             resolve();
           }
@@ -100,12 +94,12 @@ const saveFiles = asyncHandler(async (req, res) => {
 
     return res
       .status(STATUS_CODES.CREATED)
-      .json(product);
+      .send(product);
 
   } catch (error) {
 
     // Destroy product if can't save files
-    await db.Product.destroy({
+    await sequelize.models.Product.destroy({
       where: {
         id: req.newProduct.id,
       },
@@ -133,11 +127,7 @@ const getAllProducts = asyncHandler(async (req, res) => {
     const offset = (page - 1) * pageSize;
 
     // Define the where condition based on stockQuantity, categoryId, and searchQuery
-    const whereCondition = {
-      stockQuantity: {
-        [db.Sequelize.Op.gt]: 0, // Filter for stockQuantity greater than 0
-      },
-    };
+    const whereCondition = {};
 
     if (categoryId) {
       whereCondition.categoryId = categoryId;
@@ -146,18 +136,18 @@ const getAllProducts = asyncHandler(async (req, res) => {
     if (searchQuery) {
       // Add condition to search for products with names containing the searchQuery
       whereCondition.name = {
-        [db.Sequelize.Op.like]: `%${searchQuery}%`,
+        [sequelize.Sequelize.Op.like]: `%${searchQuery}%`,
       };
     }
 
     // Get all products with pagination and include associated fields (category, manufacturer, and reviews)
-    const products = await db.Product.findAll({
+    const products = await sequelize.models.Product.findAll({
       attributes: {
         exclude: ["categoryId", "manufacturerId", "createdAt", "updatedAt"],
       },
       include: [
         {
-          model: db.ProductImage,
+          model: sequelize.models.ProductImage,
           as: "ProductImages",
           attributes: {
             exclude: ["id", "createdAt", "updatedAt", "productId"],
@@ -186,21 +176,21 @@ const getProductById = asyncHandler(async (req, res) => {
 
   try {
     // Find the product by ID
-    const product = await db.Product.findByPk(productId, {
+    const product = await sequelize.models.Product.findByPk(productId, {
       include: [
         {
-          model: db.Category,
+          model: sequelize.models.Category,
           as: "Category",
         },
         {
-          model: db.Manufacturer,
+          model: sequelize.models.Manufacturer,
           as: "Manufacturer",
         },
         {
-          model: db.Review,
+          model: sequelize.models.Review,
           as: "Reviews",
         },
-        { model: db.ProductImage, as: "ProductImages" },
+        { model: sequelize.models.ProductImage, as: "ProductImages" },
       ],
     });
 
@@ -229,7 +219,7 @@ const updateProduct = asyncHandler(async (req, res) => {
 
   try {
     // Find the product by ID
-    const product = await db.Product.findByPk(productId);
+    const product = await sequelize.models.Product.findByPk(productId);
 
     // If the product doesn't exist
     if (!product) {
@@ -267,7 +257,7 @@ const deleteProduct = asyncHandler(async (req, res) => {
 
   try {
     // Find the product by ID
-    const product = await db.Product.findByPk(productId);
+    const product = await sequelize.models.Product.findByPk(productId);
 
     // If the product doesn't exist
     if (!product) {
@@ -277,7 +267,7 @@ const deleteProduct = asyncHandler(async (req, res) => {
     }
 
     // Delete associated images in ProductImage table
-    const productImages = await db.ProductImage.findAll({
+    const productImages = await sequelize.models.ProductImage.findAll({
       where: {
         productId: product.id,
       },
@@ -292,7 +282,7 @@ const deleteProduct = asyncHandler(async (req, res) => {
     await Promise.all(productImages.map(deleteImageFile));
 
     // Delete the product
-    await db.ProductImage.destroy({
+    await sequelize.models.ProductImage.destroy({
       where: {
         productId,
       },
@@ -315,15 +305,15 @@ const deleteProduct = asyncHandler(async (req, res) => {
 // @access Public
 const getAllFeaturedProducts = asyncHandler(async (req, res) => {
   try {
-    const products = await db.Product.findAll({
+    const products = await sequelize.models.Product.findAll({
       where: {
         isFeatured: true,
       },
       include: [
-        { model: db.Category, as: "Category" },
-        { model: db.Manufacturer, as: "Manufacturer" },
-        { model: db.Review, as: "Reviews" },
-        { model: db.ProductImage, as: "ProductImages" },
+        { model: sequelize.models.Category, as: "Category" },
+        { model: sequelize.models.Manufacturer, as: "Manufacturer" },
+        { model: sequelize.models.Review, as: "Reviews" },
+        { model: sequelize.models.ProductImage, as: "ProductImages" },
       ],
     });
 

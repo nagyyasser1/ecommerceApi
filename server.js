@@ -25,6 +25,10 @@ app.use(cookieParser());
 // Serve statatic files on specific path
 app.use("/", express.static(path.join(__dirname, "uploads")));
 
+app.get('/add', (req,res)=>{
+  res.sendFile(path.join(__dirname+"/views"+'/addProduct.html'));
+})
+
 // Api routes
 app.use("/", require("./routes/route")); // api welcome page
 app.use("/auth", require("./routes/authRoutes")); // andle authentication
