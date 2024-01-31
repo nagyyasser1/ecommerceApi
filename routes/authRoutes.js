@@ -1,7 +1,7 @@
-const express = require("express");
-const router = express.Router();
-const authController = require("../controllers/authController");
-const loginLimiter = require("../middlewares/loginLimiter");
+import { Router } from "express";
+const router = Router();
+import { login, refresh, logout } from "../controllers/authController.js";
+import loginLimiter from "../middlewares/loginLimiter.js";
 /**
  * @swagger
  * tags:
@@ -65,7 +65,7 @@ const loginLimiter = require("../middlewares/loginLimiter");
  *                   example: Unauthorized
  */
 
-router.post("/", loginLimiter, authController.login);
+router.post("/", loginLimiter, login);
 
 /**
  * @swagger
@@ -108,7 +108,7 @@ router.post("/", loginLimiter, authController.login);
  *                   example: Forbidden
  */
 
-router.get("/refresh",authController.refresh);
+router.get("/refresh",refresh);
 
 /**
  * @swagger
@@ -132,6 +132,6 @@ router.get("/refresh",authController.refresh);
  *                   example: Cookie cleared
  */
 
-router.route("/logout").post(authController.logout);
+router.route("/logout").post(logout);
 
-module.exports = router;
+export default router;

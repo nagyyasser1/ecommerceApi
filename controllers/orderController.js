@@ -1,7 +1,9 @@
-const asyncHandler = require("express-async-handler");
-const db = require("../models");
-const STATUS_CODES = require("../constants/STATUS_CODES");
-const ORDER_STATUS = require("../constants/ORDER_STATUS.JS");
+import asyncHandler from "express-async-handler";
+import { sequelize } from "../models/index.js";
+import ORDER_STATUS from "../constants/ORDER_STATUS.js";
+const { CREATED, SERVER_ERROR, NOT_FOUND, SUCCESS, UNAUTHORIZED, FORBIDDEN } = ORDER_STATUS;
+
+const {SHIPPED} = ORDER_STATUS;
 
 const checkOrderRequirements = async (products) => {
   if (!products || products.length === 0) {
@@ -14,11 +16,11 @@ const checkOrderRequirements = async (products) => {
       const { productId, quantity } = product;
 
       // Use findOne to check if the product exists and has sufficient stock
-      const existingProduct = await db.Product.findOne({
+      const existingProduct = await sequelize.models.Product.findOne({
         where: {
           id: productId,
           stockQuantity: {
-            [db.Sequelize.Op.gte]: quantity,
+            [sequelize.models.Sequelize.Op.gte]: quantity,
           },
         },
       });
@@ -50,7 +52,7 @@ const createOrderItems = async (order, productsWithStock, transaction) => {
     const subtotal = productPrice * quantity;
 
     // Create order item
-    await db.OrderItem.create(
+    await sequelize.models.OrderItem.create(
       {
         orderId: order.id,
         productId,
@@ -65,7 +67,7 @@ const createOrderItems = async (order, productsWithStock, transaction) => {
 
 const decrementProductStock = async (productId, quantity, transaction) => {
   // Decrement the stockQuantity of the product
-  await db.Product.decrement("stockQuantity", {
+  await sequelize.models.Product.decrement("stockQuantity", {
     by: quantity,
     where: { id: productId },
     transaction,
@@ -78,7 +80,7 @@ const addOrder = asyncHandler(async (req, res) => {
 
   try {
     // Use the build method to create a new order instance without saving it to the database
-    const newOrder = await db.Order.build({
+    const newOrder = await sequelize.models.Order.build({
       orderDate,
       totalAmount,
       userId,
@@ -88,7 +90,7 @@ const addOrder = asyncHandler(async (req, res) => {
     const productsWithStock = await checkOrderRequirements(products);
 
     // Create order items and save the order
-    await db.sequelize.transaction(async (t) => {
+    await sequelize.models.sequelize.transaction(async (t) => {
       // Save the order to the database
       await newOrder.save({ transaction: t });
 
@@ -102,7 +104,7 @@ const addOrder = asyncHandler(async (req, res) => {
       }
     });
 
-    return res.status(STATUS_CODES.CREATED).json({
+    return res.status(CREATED).json({
       message: "Order added successfully",
       order: newOrder,
     });
@@ -110,7 +112,7 @@ const addOrder = asyncHandler(async (req, res) => {
     console.error("Error adding new order:", error);
 
     // Send detailed error message to the client
-    return res.status(STATUS_CODES.SERVER_ERROR).json({
+    return res.status(SERVER_ERROR).json({
       message: "Internal Server Error",
       error: error.message, // Include the detailed error message
     });
@@ -122,12 +124,12 @@ const updateOrderStatus = asyncHandler(async (req, res) => {
 
   try {
     // Find the order by ID
-    const order = await db.Order.findByPk(orderId);
+    const order = await sequelize.models.Order.finsequelize.modelsyPk(orderId);
 
     // If the order doesn't exist
     if (!order) {
       return res
-        .status(STATUS_CODES.NOT_FOUND)
+        .status(NOT_FOUND)
         .json({ message: "Order not found" });
     }
 
@@ -137,14 +139,14 @@ const updateOrderStatus = asyncHandler(async (req, res) => {
     // Save the changes to the database
     await order.save();
 
-    return res.status(STATUS_CODES.SUCCESS).json({
+    return res.status(SUCCESS).json({
       message: "Order status updated successfully",
       order,
     });
   } catch (error) {
     console.error("Error updating order status:", error);
     return res
-      .status(STATUS_CODES.SERVER_ERROR)
+      .status(SERVER_ERROR)
       .json({ message: "Internal Server Error" });
   }
 });
@@ -152,24 +154,24 @@ const updateOrderStatus = asyncHandler(async (req, res) => {
 const getAllOrders = asyncHandler(async (req, res) => {
   try {
     // Find all orders and include associated data (e.g., order items)
-    const orders = await db.Order.findAll({
+    const orders = await sequelize.models.Order.findAll({
       include: [
         {
-          model: db.OrderItem,
-          include: [db.Product],
+          model: sequelize.models.OrderItem,
+          include: [sequelize.models.Product],
         },
-        db.User, // Include associated user
+        sequelize.models.User, // Include associated user
       ],
     });
 
-    return res.status(STATUS_CODES.SUCCESS).json({
+    return res.status(SUCCESS).json({
       message: "Orders retrieved successfully",
       orders,
     });
   } catch (error) {
     console.error("Error getting all orders:", error);
     return res
-      .status(STATUS_CODES.SERVER_ERROR)
+      .status(SERVER_ERROR)
       .json({ message: "Internal Server Error" });
   }
 });
@@ -179,25 +181,25 @@ const getMyOrders = asyncHandler(async (req, res) => {
 
   try {
     // Find all orders associated with the user
-    const orders = await db.Order.findAll({
+    const orders = await sequelize.models.Order.findAll({
       where: { userId },
-      include: [db.OrderItem], // Include associated order items in the query
+      include: [sequelize.models.OrderItem], // Include associated order items in the query
     });
 
     if (!orders || orders.length === 0) {
       return res
-        .status(STATUS_CODES.NOT_FOUND)
+        .status(NOT_FOUND)
         .json({ message: "No orders found for the user" });
     }
 
-    res.status(STATUS_CODES.SUCCESS).json({
+    res.status(SUCCESS).json({
       message: "Orders retrieved successfully",
       orders,
     });
   } catch (error) {
     console.error("Error retrieving orders:", error);
     res
-      .status(STATUS_CODES.SERVER_ERROR)
+      .status(SERVER_ERROR)
       .json({ message: "Internal Server Error" });
   }
 });
@@ -208,14 +210,14 @@ const deleteOrder = asyncHandler(async (req, res) => {
 
   try {
     // Find the order
-    const order = await db.Order.findOne({
+    const order = await sequelize.models.Order.findOne({
       where: { id: orderId },
     });
 
     // If the order is not found
     if (!order) {
       return res
-        .status(STATUS_CODES.NOT_FOUND)
+        .status(NOT_FOUND)
         .json({ message: "Order not found" });
     }
 
@@ -223,20 +225,20 @@ const deleteOrder = asyncHandler(async (req, res) => {
     // ()
     if (order.userId !== userId && !req.user.isAdmin) {
       return res
-        .status(STATUS_CODES.UNAUTHORIZED)
+        .status(UNAUTHORIZED)
         .json({ message: "Unauthorized to delete this order" });
     }
 
     // Delete the order
     await order.destroy();
 
-    res.status(STATUS_CODES.SUCCESS).json({
+    res.status(SUCCESS).json({
       message: "Order deleted successfully",
     });
   } catch (error) {
     console.error("Error deleting order:", error);
     res
-      .status(STATUS_CODES.SERVER_ERROR)
+      .status(SERVER_ERROR)
       .json({ message: "Internal Server Error" });
   }
 });
@@ -249,18 +251,18 @@ const cancelOrder = asyncHandler(async (req, res) => {
 
   try {
     // Find the order
-    const order = await db.Order.findOne({
+    const order = await sequelize.models.Order.findOne({
       where: {
         id: orderId,
         userId,
       },
       include: [
         {
-          model: db.OrderItem,
+          model: sequelize.models.OrderItem,
           as: "OrderItems",
           include: [
             {
-              model: db.Product,
+              model: sequelize.models.Product,
               as: "Product",
             },
           ],
@@ -270,25 +272,25 @@ const cancelOrder = asyncHandler(async (req, res) => {
 
     // Check if order and order.orderItems exist
     if (!order || !order?.OrderItems) {
-      return res.status(STATUS_CODES.NOT_FOUND).json({
+      return res.status(NOT_FOUND).json({
         message: "Order not found",
       });
     }
 
-    if (order.orderStatus === ORDER_STATUS.SHIPPED && !isAdmin) {
-      return res.status(STATUS_CODES.FORBIDDEN).json({
+    if (order.orderStatus === SHIPPED && !isAdmin) {
+      return res.status(FORBIDDEN).json({
         message: "Can't cancel shipped order!",
       });
     }
 
     // Restock products and delete order items
-    await db.sequelize.transaction(async (t) => {
+    await sequelize.models.sequelize.transaction(async (t) => {
       for (const orderItem of order.OrderItems) {
         if (orderItem.Product) {
           const { Product: product, quantity } = orderItem;
 
           // Restock product quantity
-          await db.Product.increment("stockQuantity", {
+          await sequelize.models.Product.increment("stockQuantity", {
             by: quantity,
             where: { id: product.id },
             transaction: t,
@@ -303,18 +305,18 @@ const cancelOrder = asyncHandler(async (req, res) => {
       await order.destroy({ transaction: t });
     });
 
-    return res.status(STATUS_CODES.SUCCESS).json({
+    return res.status(SUCCESS).json({
       message: "Order canceled successfully",
     });
   } catch (error) {
     console.error("Error canceling order:", error);
     return res
-      .status(STATUS_CODES.SERVER_ERROR)
+      .status(SERVER_ERROR)
       .json({ message: "Internal Server Error" });
   }
 });
 
-module.exports = {
+export  {
   addOrder,
   updateOrderStatus,
   getAllOrders,

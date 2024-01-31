@@ -1,8 +1,12 @@
-const { sequelize } = require("../models");
-const asyncHandler = require("express-async-handler");
-const STATUS_CODES = require("../constants/STATUS_CODES");
-const transporter = require("../config/transporter");
-const jwt = require("jsonwebtoken");
+import { sequelize } from "../models/index.js";
+import asyncHandler from "express-async-handler";
+import STATUS_CODES from "../constants/STATUS_CODES.js";
+import transporter from "../config/transporter.js";
+import pkg from 'jsonwebtoken';
+const { sign, verify } = pkg;
+
+const { BAD_REQUEST, SUCCESS, UNAUTHORIZED, CONFLICT, NOT_FOUND, SERVER_ERROR, FORBIDDEN } = STATUS_CODES;
+
 
 // @desc Get all users
 // @route GET /users
@@ -18,7 +22,7 @@ const getAllUsers = asyncHandler(async (req, res) => {
   // If no users
   if (!users?.length) {
     return res
-      .status(STATUS_CODES.BAD_REQUEST)
+      .status(BAD_REQUEST)
       .json({ message: "No users found" });
   }
 
@@ -55,18 +59,18 @@ const getUserById = asyncHandler(async (req, res) => {
   // If no user
   if (!user) {
     return res
-      .status(STATUS_CODES.BAD_REQUEST)
+      .status(BAD_REQUEST)
       .json({ message: "No user found" });
   }
 
   if (req.user.isAdmin) {
-    return res.status(STATUS_CODES.SUCCESS).send(user);
+    return res.status(SUCCESS).send(user);
   }
 
   // check for Identity
   if (user.dataValues.id !== req.user.id) {
     return res
-      .status(STATUS_CODES.UNAUTHORIZED)
+      .status(UNAUTHORIZED)
       .json({ message: "Unauthorized!" });
   }
 
@@ -88,7 +92,7 @@ const createNewUser = asyncHandler(async (req, res) => {
 
   if (duplicate) {
     return res
-      .status(STATUS_CODES.CONFLICT)
+      .status(CONFLICT)
       .json({ message: "Duplicate username" });
   }
 
@@ -106,11 +110,11 @@ const createNewUser = asyncHandler(async (req, res) => {
 
   if (newUser) { //created
     res
-      .status(STATUS_CODES.SUCCESS)
+      .status(SUCCESS)
       .json(newUser);
   } else {
     res
-      .status(STATUS_CODES.BAD_REQUEST)
+      .status(BAD_REQUEST)
       .json({ message: "Invalid user data received" });
   }
 });
@@ -124,7 +128,7 @@ const makeUserAdmin = asyncHandler(async (req, res) => {
   try {
     if (typeof isAdmin !== "boolean") {
       return res
-        .status(STATUS_CODES.BAD_REQUEST)
+        .status(BAD_REQUEST)
         .json({ message: "isAdmin must be of type boolean." });
     }
     // Find the user by ID
@@ -133,7 +137,7 @@ const makeUserAdmin = asyncHandler(async (req, res) => {
     // If no user found
     if (!user) {
       return res
-        .status(STATUS_CODES.NOT_FOUND)
+        .status(NOT_FOUND)
         .json({ message: "User not found" });
     }
 
@@ -144,12 +148,12 @@ const makeUserAdmin = asyncHandler(async (req, res) => {
     await user.save();
 
     return res
-      .status(STATUS_CODES.SUCCESS)
+      .status(SUCCESS)
       .json({ message: "User updated successfully", user });
   } catch (error) {
     console.error("Error updating user:", error);
     return res
-      .status(STATUS_CODES.SERVER_ERROR)
+      .status(SERVER_ERROR)
       .json({ message: "Internal Server Error" });
   }
 });
@@ -166,7 +170,7 @@ const deleteUser = asyncHandler(async (req, res) => {
 
     if (!user) {
       return res
-        .status(STATUS_CODES.NOT_FOUND)
+        .status(NOT_FOUND)
         .json({ message: "User not found" });
     }
 
@@ -174,12 +178,12 @@ const deleteUser = asyncHandler(async (req, res) => {
     await user.destroy();
 
     return res
-      .status(STATUS_CODES.SUCCESS)
+      .status(SUCCESS)
       .json({ message: "User deleted successfully" });
   } catch (error) {
     console.error("Error deleting user:", error);
     return res
-      .status(STATUS_CODES.SERVER_ERROR)
+      .status(SERVER_ERROR)
       .json({ message: "Internal Server Error" });
   }
 });
@@ -188,7 +192,7 @@ const sendEmailVerification = asyncHandler(async (req, res) => {
   const { email } = req.body;
 
   // Generate a unique token for email verification
-  const verificationToken = jwt.sign(
+  const verificationToken = sign(
     {
       email,
     },
@@ -216,13 +220,13 @@ const sendEmailVerification = asyncHandler(async (req, res) => {
 
 const verifyEmail = asyncHandler(async (req, res) => {
   const token = req.params.token;
-  jwt.verify(
+  verify(
     token,
     process.env.ACCESS_TOKEN_SECRET,
     asyncHandler(async (err, decoded) => {
       if (err)
         return res
-          .status(STATUS_CODES.FORBIDDEN)
+          .status(FORBIDDEN)
           .json({ message: "Forbidden" });
 
       const foundUser = await sequelize.models.User.findOne({
@@ -233,7 +237,7 @@ const verifyEmail = asyncHandler(async (req, res) => {
 
       if (!foundUser)
         return res
-          .status(STATUS_CODES.UNAUTHORIZED)
+          .status(UNAUTHORIZED)
           .json({ message: "Unauthorized" });
 
       foundUser.verified = true;
@@ -243,7 +247,7 @@ const verifyEmail = asyncHandler(async (req, res) => {
   );
 });
 
-module.exports = {
+export  {
   getAllUsers,
   createNewUser,
   makeUserAdmin,

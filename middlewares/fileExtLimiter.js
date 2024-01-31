@@ -1,4 +1,4 @@
-const path = require("path");
+import { extname } from "path";
 
 const fileExtLimiter = (allowedExtArray) => {
   return (req, res, next) => {
@@ -6,7 +6,7 @@ const fileExtLimiter = (allowedExtArray) => {
 
     const fileExtensions = [];
     Object.keys(files).forEach((key) => {
-      fileExtensions.push(path.extname(files[key].name));
+      fileExtensions.push(extname(files[key].name));
     });
 
     // Are the file extension allowed?
@@ -28,4 +28,4 @@ const fileExtLimiter = (allowedExtArray) => {
   };
 };
 
-module.exports = fileExtLimiter;
+export default fileExtLimiter;

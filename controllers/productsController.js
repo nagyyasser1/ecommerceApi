@@ -1,9 +1,12 @@
-const { sequelize } = require("../models");
-const asyncHandler = require("express-async-handler");
-const STATUS_CODES = require("../constants/STATUS_CODES");
-const deleteFile = require("../utils/deleteFile");
-const path = require("path");
-const { categoryExists, sizesExist } = require("../utils/validations/product.validations");
+import { sequelize } from "../models/index.js";
+import asyncHandler from "express-async-handler";
+import STATUS_CODES from "../constants/STATUS_CODES.js";
+import deleteFile from "../utils/deleteFile.js";
+import { join } from "path";
+import { categoryExists, sizesExist } from "../utils/validations/product.validations.js";
+
+const { NOT_FOUND, SERVER_ERROR, CREATED, SUCCESS } = STATUS_CODES;
+
 
 // @desc Add New product
 // @route /product
@@ -26,7 +29,7 @@ const addProduct = asyncHandler(async (req, res, next) => {
 
     if (!categoryResult.isValid) {
       return res
-        .status(STATUS_CODES.NOT_FOUND)
+        .status(NOT_FOUND)
         .send(categoryResult.error);
     }
 
@@ -35,7 +38,7 @@ const addProduct = asyncHandler(async (req, res, next) => {
 
     if (!sizesResult.isValid) {
       return res
-        .status(STATUS_CODES.NOT_FOUND)
+        .status(NOT_FOUND)
         .send(sizesResult.error);
     }
 
@@ -48,12 +51,22 @@ const addProduct = asyncHandler(async (req, res, next) => {
       CategoryId: categoryId,
     });
 
+    for (let i = 0; i < sizes.length; i++) {
+      await sequelize.models.ProductSize.create({
+        color: sizes[i].color,
+        quantity: sizes[i].quantity,
+        ProductId: sizes[i].ProductId,
+        SizeId: sizes[i].sizeId,
+        ProductId: newProduct.id
+      })
+    }
+
     req.newProduct = newProduct;
     next();
   } catch (error) {
     console.error("Error adding new product:", error);
     return res
-      .status(STATUS_CODES.SERVER_ERROR)
+      .status(SERVER_ERROR)
       .json({ message: "Internal Server Error", error });
   }
 });
@@ -68,7 +81,7 @@ const saveFiles = asyncHandler(async (req, res) => {
     const { id: productId } = product;
 
     const promises = Object.keys(files).map(async (key) => {
-      const filepath = path.join(
+      const filepath = join(
         __dirname,
         "../uploads",
         productId + files[key].name
@@ -93,7 +106,7 @@ const saveFiles = asyncHandler(async (req, res) => {
     await Promise.all(promises);
 
     return res
-      .status(STATUS_CODES.CREATED)
+      .status(CREATED)
       .send(product);
 
   } catch (error) {
@@ -107,7 +120,7 @@ const saveFiles = asyncHandler(async (req, res) => {
 
     console.error("Error saving files:", error);
     return res
-      .status(STATUS_CODES.SERVER_ERROR)
+      .status(SERVER_ERROR)
       .json({ message: "Error saving files", error });
   }
 });
@@ -159,11 +172,11 @@ const getAllProducts = asyncHandler(async (req, res) => {
       limit: pageSize,
     });
 
-    return res.status(STATUS_CODES.SUCCESS).json({ products });
+    return res.status(SUCCESS).json({ products });
   } catch (error) {
     console.error("Error getting all products:", error);
     return res
-      .status(STATUS_CODES.SERVER_ERROR)
+      .status(SERVER_ERROR)
       .json({ message: "Internal Server Error" });
   }
 });
@@ -181,31 +194,68 @@ const getProductById = asyncHandler(async (req, res) => {
         {
           model: sequelize.models.Category,
           as: "Category",
-        },
-        {
-          model: sequelize.models.Manufacturer,
-          as: "Manufacturer",
+          attributes: {
+            exclude: ["createdAt", "updatedAt"]
+          }
         },
         {
           model: sequelize.models.Review,
           as: "Reviews",
+          attributes: {
+            exclude: ["createdAt", "updatedAt"]
+          }
         },
-        { model: sequelize.models.ProductImage, as: "ProductImages" },
+        {
+          model: sequelize.models.Size,
+          // through: { 
+          //   attributes: ['quantity', 'color'], 
+          // }
+        },
+        {
+          model: sequelize.models.ProductImage, as: "ProductImages", attributes: {
+            exclude: ["createdAt", "updatedAt"]
+          }
+        },
       ],
+      attributes: {
+        exclude: ["createdAt", "updatedAt", "CategoryId"]
+      }
     });
 
     // Check if the product exists
     if (!product) {
-      return res.status(STATUS_CODES.NOT_FOUND).json({
+      return res.status(NOT_FOUND).json({
         message: "Product not found",
       });
     }
 
-    return res.status(STATUS_CODES.SUCCESS).send(product);
+    const modifiedProduct = {
+      id: product.id,
+      name: product.name,
+      description: product.description,
+      price: product.price,
+      featured: product.isFeatured,
+      category: product.Category ? product.Category.categoryName : null,
+      reviews: product.Reviews.map((review) => ({
+        rating: review.rating,
+        comment: review.comment,
+        UserId: review.UserId,
+      })),
+      images: product.ProductImages.map((image) => image.imageUrl),
+      sizes: product.Sizes.map((size) => {
+        return {
+          type: size.type,
+          color: size.ProductSize.color,
+          quantity: size.ProductSize.quantity
+        }
+      })
+    };
+
+    return res.status(SUCCESS).send(modifiedProduct);
   } catch (error) {
     console.error("Error getting product by ID:", error);
     return res
-      .status(STATUS_CODES.SERVER_ERROR)
+      .status(SERVER_ERROR)
       .json({ message: "Internal Server Error" });
   }
 });
@@ -224,7 +274,7 @@ const updateProduct = asyncHandler(async (req, res) => {
     // If the product doesn't exist
     if (!product) {
       return res
-        .status(STATUS_CODES.NOT_FOUND)
+        .status(NOT_FOUND)
         .json({ message: "Product not found" });
     }
 
@@ -239,12 +289,12 @@ const updateProduct = asyncHandler(async (req, res) => {
     await product.save();
 
     res
-      .status(STATUS_CODES.SUCCESS)
+      .status(SUCCESS)
       .json({ message: "Product updated successfully", product });
   } catch (error) {
     console.error("Error updating product:", error);
     res
-      .status(STATUS_CODES.SERVER_ERROR)
+      .status(SERVER_ERROR)
       .json({ message: "Internal Server Error" });
   }
 });
@@ -262,7 +312,7 @@ const deleteProduct = asyncHandler(async (req, res) => {
     // If the product doesn't exist
     if (!product) {
       return res
-        .status(STATUS_CODES.NOT_FOUND)
+        .status(NOT_FOUND)
         .json({ message: "Product not found" });
     }
 
@@ -290,12 +340,12 @@ const deleteProduct = asyncHandler(async (req, res) => {
     await product.destroy();
 
     res
-      .status(STATUS_CODES.SUCCESS)
+      .status(SUCCESS)
       .json({ message: "Product deleted successfully" });
   } catch (error) {
     console.error("Error deleting product:", error);
     res
-      .status(STATUS_CODES.SERVER_ERROR)
+      .status(SERVER_ERROR)
       .json({ message: "Internal Server Error" });
   }
 });
@@ -317,16 +367,16 @@ const getAllFeaturedProducts = asyncHandler(async (req, res) => {
       ],
     });
 
-    return res.status(STATUS_CODES.SUCCESS).json({ products });
+    return res.status(SUCCESS).json({ products });
   } catch (error) {
     console.error("Error getting all products:", error);
     return res
-      .status(STATUS_CODES.SERVER_ERROR)
+      .status(SERVER_ERROR)
       .json({ message: "Internal Server Error" });
   }
 });
 
-module.exports = {
+export {
   addProduct,
   getAllProducts,
   getProductById,

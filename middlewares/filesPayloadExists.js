@@ -1,4 +1,4 @@
-const STATUS_CODES = require("../constants/STATUS_CODES");
+import STATUS_CODES from "../constants/STATUS_CODES.js";
 
 const filesPayloadExists = (req, res, next) => {
   if (!req.files)
@@ -8,4 +8,4 @@ const filesPayloadExists = (req, res, next) => {
   next();
 };
 
-module.exports = filesPayloadExists;
+export default filesPayloadExists;

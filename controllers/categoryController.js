@@ -1,6 +1,8 @@
-const asyncHandler = require("express-async-handler");
-const { sequelize } = require("../models");
-const STATUS_CODES = require("../constants/STATUS_CODES");
+import asyncHandler from "express-async-handler";
+import { sequelize } from "../models/index.js";
+import STATUS_CODES from "../constants/STATUS_CODES.js";
+
+const { BAD_REQUEST, CREATED, SERVER_ERROR, NOT_FOUND, NO_CONTENT, SUCCESS } = STATUS_CODES;
 
 // @desc Add new Category
 // @route /category
@@ -18,7 +20,7 @@ const addCategory = asyncHandler(async (req, res) => {
 
     if (existingCategory) {
       return res
-        .status(STATUS_CODES.BAD_REQUEST)
+        .status(BAD_REQUEST)
         .json({ message: "Category already exists!" });
     }
 
@@ -29,12 +31,12 @@ const addCategory = asyncHandler(async (req, res) => {
     });
 
     return res
-      .status(STATUS_CODES.CREATED)
+      .status(CREATED)
       .json(newCategory);
   } catch (error) {
     console.error("Error adding category:", error);
     return res
-      .status(STATUS_CODES.SERVER_ERROR)
+      .status(SERVER_ERROR)
       .json({ message: "Internal Server Error" });
   }
 });
@@ -51,18 +53,18 @@ const deleteCategory = asyncHandler(async (req, res) => {
 
     if (!categoryToDelete) {
       return res
-        .status(STATUS_CODES.NOT_FOUND)
+        .status(NOT_FOUND)
         .json({ message: "Category not found" });
     }
 
     // Delete the category
     await categoryToDelete.destroy();
 
-    return res.status(STATUS_CODES.NO_CONTENT).send();
+    return res.status(NO_CONTENT).send();
   } catch (error) {
     console.error("Error deleting category:", error);
     return res
-      .status(STATUS_CODES.SERVER_ERROR)
+      .status(SERVER_ERROR)
       .json({ message: "Internal Server Error" });
   }
 });
@@ -74,11 +76,11 @@ const getAllCategories = asyncHandler(async (req, res) => {
   try {
     const categories = await sequelize.models.Category.findAll();
 
-    return res.status(STATUS_CODES.SUCCESS).send(categories);
+    return res.status(SUCCESS).send(categories);
   } catch (error) {
     console.error("Error getting all categories:", error);
     return res
-      .status(STATUS_CODES.SERVER_ERROR)
+      .status(SERVER_ERROR)
       .json({ message: "Internal Server Error" });
   }
 });
@@ -91,7 +93,7 @@ const updateCategory = asyncHandler(async (req, res) => {
     const category = await sequelize.models.Category.finsequelize.modelsyPk(categoryId);
 
     if (!category) {
-      return res.status(STATUS_CODES.NOT_FOUND).json({
+      return res.status(NOT_FOUND).json({
         message: "Category not found.",
       });
     }
@@ -103,19 +105,19 @@ const updateCategory = asyncHandler(async (req, res) => {
     // Save the updated category
     await category.save();
 
-    return res.status(STATUS_CODES.SUCCESS).json({
+    return res.status(SUCCESS).json({
       message: "Category updated successfully.",
       category,
     });
   } catch (error) {
     console.error("Error updating category:", error);
-    return res.status(STATUS_CODES.SERVER_ERROR).json({
+    return res.status(SERVER_ERROR).json({
       message: "Internal Server Error",
     });
   }
 });
 
-module.exports = {
+export  {
   addCategory,
   deleteCategory,
   getAllCategories,

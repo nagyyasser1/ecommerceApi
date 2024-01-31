@@ -1,7 +1,8 @@
-const verifyJWT = require("../middlewares/verifyJWT");
-const orderController = require("../controllers/orderController");
-const router = require("express").Router();
-const isAdmin = require("../middlewares/isAdmin");
+import verifyJWT from "../middlewares/verifyJWT.js";
+import { addOrder, getMyOrders, getAllOrders, updateOrderStatus, cancelOrder } from "../controllers/orderController.js";
+import { Router } from "express";
+import isAdmin from "../middlewares/isAdmin.js";
+const router = Router();
 
 /**
  * @swagger
@@ -68,7 +69,7 @@ const isAdmin = require("../middlewares/isAdmin");
  *                   message: Internal Server Error
  */
 
-router.post("/", verifyJWT, orderController.addOrder);
+router.post("/", verifyJWT, addOrder);
 
 /**
  * @swagger
@@ -104,7 +105,7 @@ router.post("/", verifyJWT, orderController.addOrder);
  *                   message: Internal Server Error
  */
 
-router.get("/myorders", verifyJWT, orderController.getMyOrders);
+router.get("/myorders", verifyJWT, getMyOrders);
 
 /**
  * @swagger
@@ -134,7 +135,7 @@ router.get("/myorders", verifyJWT, orderController.getMyOrders);
  *                   message: Internal Server Error
  */
 
-router.get("/", isAdmin, orderController.getAllOrders);
+router.get("/", isAdmin, getAllOrders);
 
 /**
  * @swagger
@@ -185,7 +186,7 @@ router.get("/", isAdmin, orderController.getAllOrders);
  *                   message: Internal Server Error
  */
 
-router.put("/", isAdmin, orderController.updateOrderStatus);
+router.put("/", isAdmin, updateOrderStatus);
 
 /**
  * @swagger
@@ -231,9 +232,10 @@ router.put("/", isAdmin, orderController.updateOrderStatus);
  *               message: Internal Server Error
  */
 
-router.patch("/cancel/:orderId", verifyJWT, orderController.cancelOrder);
+router.patch("/cancel/:orderId", verifyJWT, cancelOrder);
 
-module.exports = router;
+export default router;
+
 /**
  * @swagger
  * tags:

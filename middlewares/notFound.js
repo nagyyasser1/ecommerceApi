@@ -1,9 +1,9 @@
-const path = require("path");
+import { join } from "path";
 
 const notFound = (req, res, next) => {
   res.status(404);
   if (req.accepts("html")) {
-    res.sendFile(path.join(__dirname, "../views", "404.html"));
+    res.sendFile(join(__dirname, "../views", "404.html"));
   } else if (req.accepts("json")) {
     res.json({ message: "Page Not Found!" });
   } else {
@@ -11,4 +11,4 @@ const notFound = (req, res, next) => {
   }
 };
 
-module.exports = notFound;
+export default notFound;

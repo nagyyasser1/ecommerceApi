@@ -1,4 +1,8 @@
-module.exports = (sequelize, DataTypes) => {
+// review.js
+import { DataTypes } from 'sequelize';
+import { sequelize } from './index.js';
+
+const defineReviewModel = () => {
   const Review = sequelize.define('Review', {
     id: {
       type: DataTypes.INTEGER,
@@ -16,4 +20,6 @@ module.exports = (sequelize, DataTypes) => {
   });
 
   return Review;
-}
+};
+
+export default defineReviewModel;

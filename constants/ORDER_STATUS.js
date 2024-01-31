@@ -10,4 +10,6 @@ const ORDER_STATUS = {
   COMPLETED: "completed",
 };
 
-module.exports = ORDER_STATUS;
+
+
+export default ORDER_STATUS;

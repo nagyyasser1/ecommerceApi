@@ -1,6 +1,7 @@
-const Joi = require('joi');
-const { sequelize } = require('../../models');
-const STATUS_CODES = require('../../constants/STATUS_CODES');
+import Joi from 'joi';
+
+import { sequelize } from '../../models/index.js';
+import STATUS_CODES from '../../constants/STATUS_CODES.js';
 
 const schema = Joi.object({
     name: Joi.string().required(),
@@ -11,7 +12,8 @@ const schema = Joi.object({
     sizes: Joi.array().items(
         Joi.object({
             quantity: Joi.number().required(),
-            sizeId: Joi.string().required()
+            sizeId: Joi.string().required(),
+            color: Joi.string().required()
         })
     )
 });
@@ -83,7 +85,7 @@ const categoryExists = async (categoryId) => {
 };
 
 
-module.exports = {
+export  {
     validateProductData,
     sizesExist,
     categoryExists

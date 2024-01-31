@@ -47,6 +47,7 @@
             <div class="sizeInput">
                 <input type="text" class="sizeQuantity" placeholder="Quantity" />
                 <input type="text" class="sizeId" placeholder="Size ID" />
+                <input type="text" class="color" placeholder="Color" />
             </div>
         </div>
         <button type="button" onclick="addSizeInput()">Add Size</button>
@@ -66,6 +67,7 @@
             sizeInput.innerHTML = `
                 <input type="text" class="sizeQuantity" placeholder="Quantity" />
                 <input type="text" class="sizeId" placeholder="Size ID" />
+                <input type="text" class="color" placeholder="Color" />
             `;
             sizesContainer.appendChild(sizeInput);
         };
@@ -80,6 +82,7 @@
             const sizesArray = Array.from(sizesInputs).map((sizeInput) => ({
                 quantity: sizeInput.querySelector('.sizeQuantity').value,
                 sizeId: sizeInput.querySelector('.sizeId').value,
+                color: sizeInput.querySelector('.color').value,
             }));
 
             const myFiles = document.getElementById('myFiles').files;

@@ -1,4 +1,7 @@
-module.exports = (sequelize, DataTypes) => {
+import { DataTypes } from 'sequelize';
+import { sequelize } from './index.js';
+
+const defineProductModel = () => {
   const Product = sequelize.define('Product', {
     id: {
       type: DataTypes.INTEGER,
@@ -26,3 +29,5 @@ module.exports = (sequelize, DataTypes) => {
 
   return Product;
 };
+
+export default defineProductModel;

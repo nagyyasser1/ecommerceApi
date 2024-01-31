@@ -1,7 +1,8 @@
-const categoryController = require("../controllers/categoryController");
-const isAdmin = require("../middlewares/isAdmin");
-const { validateNewCategoryData } = require("../utils/validations/category.validations");
-const router = require("express").Router();
+import { getAllCategories, addCategory, updateCategory, deleteCategory } from "../controllers/categoryController.js";
+import isAdmin from "../middlewares/isAdmin.js";
+import { validateNewCategoryData } from "../utils/validations/category.validations.js";
+import { Router } from "express";
+const router = Router();
 
 /**
  * @swagger
@@ -40,7 +41,7 @@ router.use(isAdmin);
  *                   createdAt: "2023-01-02T10:00:00Z"
  *                   updatedAt: "2023-01-02T10:45:00Z"
  */
-router.get("/", categoryController.getAllCategories);
+router.get("/", getAllCategories);
 
 /**
  * @swagger
@@ -94,7 +95,7 @@ router.get("/", categoryController.getAllCategories);
  *             example:
  *               message: Internal Server Error
  */
-router.post("/", validateNewCategoryData, categoryController.addCategory);
+router.post("/", validateNewCategoryData, addCategory);
 
 /**
  * @swagger
@@ -145,7 +146,7 @@ router.post("/", validateNewCategoryData, categoryController.addCategory);
  *             example:
  *               message: Internal Server Error
  */
-router.put("/", categoryController.updateCategory);
+router.put("/", updateCategory);
 
 /**
  * @swagger
@@ -180,9 +181,9 @@ router.put("/", categoryController.updateCategory);
  *             example:
  *               message: Internal Server Error
  */
-router.delete("/:categoryId", categoryController.deleteCategory);
+router.delete("/:categoryId", deleteCategory);
 
-module.exports = router;
+export default router;
 
 /**
  * @swagger

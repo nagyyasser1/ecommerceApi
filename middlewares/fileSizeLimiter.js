@@ -32,4 +32,4 @@ const fileSizeLimiter = (req, res, next) => {
   next();
 };
 
-module.exports = fileSizeLimiter;
+export default fileSizeLimiter;

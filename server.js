@@ -1,43 +1,55 @@
-require("dotenv").config();
-const express = require("express");
+import dotenv from "dotenv"
+dotenv.config();
+import express, { json, urlencoded } from "express";
 const app = express();
-const cors = require("cors");
-const path = require("path");
-const cookieParser = require("cookie-parser");
-const corsOptions = require("./config/corsOptions");
-const { logger, logEvents } = require("./middlewares/logger");
-const notFound = require("./middlewares/notFound");
-const errorHandler = require("./middlewares/errorHandler");
-const swaggerUI = require("swagger-ui-express");
-const swaggerJsDoc = require("swagger-jsdoc");
-const swaggerOpt = require("./config/swaggerOpt");
-const { sequelize } = require("./models");
+import cors from "cors";
+import cookieParser from "cookie-parser";
+import corsOptions from "./config/corsOptions.js";
+import { logger, logEvents } from "./middlewares/logger.js";
+import notFound from "./middlewares/notFound.js";
+import errorHandler from "./middlewares/errorHandler.js";
+import { serve, setup } from "swagger-ui-express";
+import swaggerJsDoc from "swagger-jsdoc";
+import swaggerOpt from "./config/swaggerOpt.js";
+import { sequelize } from "./models/index.js";
+import { join, dirname } from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 const PORT = process.env.PORT || 3500;
 
 // Setup Useful Middlewares
 app.use(logger); //log every request 
 app.use(cors(corsOptions)); //allow only specific origins 
-app.use(express.json());  //parse application/json 
-app.use(express.urlencoded({ extended: true }));   //parse form data
+app.use(json());  //parse application/json 
+app.use(urlencoded({ extended: true }));   //parse form data
 app.use(cookieParser());
 
 // Serve statatic files on specific path
-app.use("/", express.static(path.join(__dirname, "uploads")));
+app.use("/", express.static(join(__dirname, "uploads")));
 
 app.get('/add', (req,res)=>{
-  res.sendFile(path.join(__dirname+"/views"+'/addProduct.html'));
+  res.sendFile(join(__dirname+"/views"+'/addProduct.html'));
 })
 
+// Import Routes
+import route from "./routes/route.js"
+import authRoutes from "./routes/authRoutes.js"
+import apiRoutes from "./routes/apiRoutes.js"
+import contactRoutes from "./routes/contactRoutes.js"
+
+
 // Api routes
-app.use("/", require("./routes/route")); // api welcome page
-app.use("/auth", require("./routes/authRoutes")); // andle authentication
-app.use("/api", require("./routes/apiRoutes")); // ecommerce endpoints
-app.use("/contact", require("./routes/contactRoutes")); // mangage messages via email
+app.use("/", route); // api welcome page
+app.use("/auth", authRoutes); // andle authentication
+app.use("/api", apiRoutes); // ecommerce endpoints
+app.use("/contact", contactRoutes); // mangage messages via email
 
 // Swagger documentaion
 const specs = swaggerJsDoc(swaggerOpt);
-app.use("/api-docs", swaggerUI.serve, swaggerUI.setup(specs));
+app.use("/api-docs", serve, setup(specs));
 
 // Handle errors
 app.all("*", notFound);

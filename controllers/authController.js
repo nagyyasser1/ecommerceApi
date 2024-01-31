@@ -1,8 +1,10 @@
-const { sequelize } = require("../models");
-const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
-const asyncHandler = require("express-async-handler");
-const STATUS_CODES = require("../constants/STATUS_CODES");
+import { sequelize } from "../models/index.js";
+import { compare } from "bcrypt";
+import pkg from 'jsonwebtoken';
+const { sign, verify } = pkg;
+import asyncHandler from "express-async-handler";
+import STATUS_CODES from "../constants/STATUS_CODES.js";
+const { UNAUTHORIZED, NOT_FOUND, BAD_REQUEST, FORBIDDEN, NO_CONTENT } = STATUS_CODES;
 
 // @desc Login
 // @route POST /auth
@@ -12,7 +14,7 @@ const login = asyncHandler(async (req, res) => {
 
   if (!email || !password) {
     return res
-      .status(STATUS_CODES.UNAUTHORIZED)
+      .status(UNAUTHORIZED)
       .json({ message: "All fields are required! {email , password}" });
   }
 
@@ -25,18 +27,18 @@ const login = asyncHandler(async (req, res) => {
 
   if (!foundUser) {
     return res
-      .status(STATUS_CODES.NOT_FOUND)
+      .status(NOT_FOUND)
       .json({ message: "email or password incorrect!" });
   }
 
-  const match = await bcrypt.compare(password, foundUser.password);
+  const match = await compare(password, foundUser.password);
 
   if (!match)
     return res
-      .status(STATUS_CODES.BAD_REQUEST)
+      .status(BAD_REQUEST)
       .json({ message: "email or password incorrect!" });
 
-  const accessToken = jwt.sign(
+  const accessToken = sign(
     {
       username: foundUser.username,
       email: foundUser.email,
@@ -47,7 +49,7 @@ const login = asyncHandler(async (req, res) => {
     { expiresIn: "1h" }
   );
 
-  const refreshToken = jwt.sign(
+  const refreshToken = sign(
     {
       username: foundUser.username,
       email: foundUser.email,
@@ -78,18 +80,18 @@ const refresh = (req, res) => {
 
   if (!cookies?.jwt)
     return res
-      .status(STATUS_CODES.UNAUTHORIZED)
+      .status(UNAUTHORIZED)
       .json({ message: "Unauthorized" });
 
   const refreshToken = cookies.jwt;
 
-  jwt.verify(
+  verify(
     refreshToken,
     process.env.REFRESH_TOKEN_SECRET,
     asyncHandler(async (err, decoded) => {
       if (err)
         return res
-          .status(STATUS_CODES.FORBIDDEN)
+          .status(FORBIDDEN)
           .json({ message: "Forbidden" });
 
       const foundUser = await sequelize.models.User.findOne({
@@ -100,10 +102,10 @@ const refresh = (req, res) => {
 
       if (!foundUser)
         return res
-          .status(STATUS_CODES.UNAUTHORIZED)
+          .status(UNAUTHORIZED)
           .json({ message: "Unauthorized" });
 
-      const accessToken = jwt.sign(
+      const accessToken = sign(
         {
           username: foundUser.username,
           email: foundUser.email,
@@ -124,12 +126,12 @@ const refresh = (req, res) => {
 // @access Public
 const logout = (req, res) => {
   const cookies = req.cookies;
-  if (!cookies?.jwt) return res.sendStatus(STATUS_CODES.NO_CONTENT); //No content
+  if (!cookies?.jwt) return res.sendStatus(NO_CONTENT); //No content
   res.clearCookie("jwt", { httpOnly: true, sameSite: "None", secure: process.env.NODE_ENV });
   res.json({ message: "Cookie cleared" });
 };
 
-module.exports = {
+export  {
   login,
   refresh,
   logout,

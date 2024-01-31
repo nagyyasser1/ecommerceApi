@@ -1,7 +1,8 @@
-const reviewsController = require("../controllers/reviewsController");
-const verifyJWT = require("../middlewares/verifyJWT");
-const router = require("express").Router();
-const { validateNewReviewData } = require("../utils/validations/review.validations")
+import { addReview, updateReview, deleteReview } from "../controllers/reviewsController.js";
+import { Router } from "express";
+import verifyJWT from "../middlewares/verifyJWT.js";
+const router = Router();
+import { validateNewReviewData } from "../utils/validations/review.validations.js";
 
 /**
  * @swagger
@@ -74,7 +75,7 @@ const { validateNewReviewData } = require("../utils/validations/review.validatio
  *                   type: string
  */
 
-router.post("/", verifyJWT, validateNewReviewData, reviewsController.addReview);
+router.post("/", verifyJWT, validateNewReviewData, addReview);
 
 /**
  * @swagger
@@ -151,7 +152,7 @@ router.post("/", verifyJWT, validateNewReviewData, reviewsController.addReview);
  *                   type: string
  */
 
-router.put("/", verifyJWT, reviewsController.updateReview);
+router.put("/", verifyJWT, updateReview);
 
 /**
  * @swagger
@@ -222,9 +223,9 @@ router.put("/", verifyJWT, reviewsController.updateReview);
  *                   type: string
  */
 
-router.delete("/", verifyJWT, reviewsController.deleteReview);
+router.delete("/", verifyJWT, deleteReview);
 
-module.exports = router;
+export default router;
 
 /**
  * @swagger

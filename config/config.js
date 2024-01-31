@@ -1,4 +1,4 @@
-{
+const environment = {
     "development": {
         "username": "postgres",
         "password": "postgres",
@@ -22,3 +22,5 @@
         "dialect": "postgres"
     }
 }
+
+export default environment;

@@ -1,5 +1,6 @@
-const Joi = require('joi');
-const STATUS_CODES = require('../../constants/STATUS_CODES');
+import Joi from 'joi';
+
+import STATUS_CODES from '../../constants/STATUS_CODES.js';
 
 // Define the Joi schema
 const schema = Joi.object({
@@ -15,6 +16,6 @@ const validateNewSizeData= (req,res,next) => {
     next();
 }
 
-module.exports = {
+export  {
     validateNewSizeData
 }

@@ -1,8 +1,8 @@
-const transporter = require("../config/transporter");
-const verifyJWT = require("../middlewares/verifyJWT");
-const STATUS_CODES = require("../constants/STATUS_CODES");
-
-const router = require("express").Router();
+import transporter from "../config/transporter.js";
+import verifyJWT from "../middlewares/verifyJWT.js";
+import STATUS_CODES from "../constants/STATUS_CODES.js";
+import { Router } from "express";
+const router = Router();
 
 /**
  * @swagger
@@ -92,4 +92,4 @@ router.post("/", verifyJWT, (req, res) => {
   });
 });
 
-module.exports = router;
+export default router;

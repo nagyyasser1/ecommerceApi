@@ -1,11 +1,14 @@
-const router = require("express").Router();
-const isAdmin = require("../middlewares/isAdmin");
-const productsController = require("../controllers/productsController");
-const fileUpload = require("express-fileupload");
-const filePayloadExists = require("../middlewares/filesPayloadExists");
-const fileSizeLimiter = require("../middlewares/fileSizeLimiter");
-const fileExtLimiter = require("../middlewares/fileExtLimiter");
-const { validateProductData } = require("../utils/validations/product.validations");
+import { Router } from "express";
+import isAdmin from "../middlewares/isAdmin.js";
+import { getAllProducts, getAllFeaturedProducts, getProductById, addProduct, saveFiles, updateProduct, deleteProduct } from "../controllers/productsController.js";
+import fileUpload from "express-fileupload";
+import filePayloadExists from "../middlewares/filesPayloadExists.js";
+import fileSizeLimiter from "../middlewares/fileSizeLimiter.js";
+import fileExtLimiter from "../middlewares/fileExtLimiter.js";
+import { validateProductData } from "../utils/validations/product.validations.js";
+
+const router = Router();
+
 
 /**
  * @swagger
@@ -62,7 +65,7 @@ const { validateProductData } = require("../utils/validations/product.validation
  *                     productImages: [{ id: 2, url: "image2.jpg" }]
  */
 
-router.get("/", productsController.getAllProducts);
+router.get("/", getAllProducts);
 
 /**
  * @swagger
@@ -96,7 +99,7 @@ router.get("/", productsController.getAllProducts);
  *                   reviews: [{ id: 2, rating: 5, comment: "Excellent featured product" }]
  *                   productImages: [{ id: 2, url: "featured-image2.jpg" }]
  */
-router.get("/featured", productsController.getAllFeaturedProducts);
+router.get("/featured", getAllFeaturedProducts);
 
 /**
  * @swagger
@@ -151,7 +154,7 @@ router.get("/featured", productsController.getAllFeaturedProducts);
  *               example:
  *                 message: Internal Server Error
  */
-router.get("/:productId", productsController.getProductById);
+router.get("/:productId", getProductById);
 
 /**
  * @swagger
@@ -252,8 +255,8 @@ router.post(
   fileExtLimiter([".png", ".jpg", ".jpeg"]),
   fileSizeLimiter,
   validateProductData,
-  productsController.addProduct,
-  productsController.saveFiles
+  addProduct,
+  saveFiles
 );
 
 /**
@@ -334,7 +337,7 @@ router.post(
  *               example:
  *                 message: Internal Server Error
  */
-router.put("/:productId", isAdmin, productsController.updateProduct);
+router.put("/:productId", isAdmin, updateProduct);
 
 /**
  * @swagger
@@ -378,9 +381,9 @@ router.put("/:productId", isAdmin, productsController.updateProduct);
  *               example:
  *                 message: Internal Server Error
  */
-router.delete("/:productId", isAdmin, productsController.deleteProduct);
+router.delete("/:productId", isAdmin, deleteProduct);
 
-module.exports = router;
+export default router;
 
 /**
  * @swagger

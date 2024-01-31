@@ -1,9 +1,9 @@
-const express = require("express");
-const router = express.Router();
-const usersController = require("../controllers/usersController");
-const verifyJWT = require("../middlewares/verifyJWT");
-const isAdmin = require("../middlewares/isAdmin");
-const { validateUserRegisterData } = require("../utils/validations/user.validations");
+import { Router } from "express";
+const router = Router();
+import { createNewUser, sendEmailVerification, getAllUsers, getUserById, verifyEmail, makeUserAdmin, deleteUser } from "../controllers/usersController.js";
+import verifyJWT from "../middlewares/verifyJWT.js";
+import isAdmin from "../middlewares/isAdmin.js";
+import { validateUserRegisterData } from "../utils/validations/user.validations.js";
 
 /**
  * @swagger
@@ -51,7 +51,7 @@ const { validateUserRegisterData } = require("../utils/validations/user.validati
  *             example:
  *               message: Duplicate email
  */
-router.post("/", validateUserRegisterData, usersController.createNewUser);
+router.post("/", validateUserRegisterData, createNewUser);
 
 /**
  * @swagger
@@ -83,7 +83,7 @@ router.post("/", validateUserRegisterData, usersController.createNewUser);
  *             example:
  *               message: Internal Server Error
  */
-router.post("/send-verification-token", usersController.sendEmailVerification);
+router.post("/send-verification-token", sendEmailVerification);
 
 /**
  * @swagger
@@ -127,7 +127,7 @@ router.post("/send-verification-token", usersController.sendEmailVerification);
  *             example:
  *               message: Unauthorized
  */
-router.get("/", isAdmin, usersController.getAllUsers);
+router.get("/", isAdmin, getAllUsers);
 
 /**
  * @swagger
@@ -172,7 +172,7 @@ router.get("/", isAdmin, usersController.getAllUsers);
  *             example:
  *               message: Unauthorized
  */
-router.get("/:userId", verifyJWT, usersController.getUserById);
+router.get("/:userId", verifyJWT, getUserById);
 
 /**
  * @swagger
@@ -212,7 +212,7 @@ router.get("/:userId", verifyJWT, usersController.getUserById);
  *             example:
  *               message: Forbidden
  */
-router.get("/verify-email/:token", usersController.verifyEmail);
+router.get("/verify-email/:token", verifyEmail);
 
 /**
  * @swagger
@@ -287,10 +287,10 @@ router.get("/verify-email/:token", usersController.verifyEmail);
 router.use(isAdmin);
 router
   .route("/")
-  .patch(usersController.makeUserAdmin)
-  .delete(usersController.deleteUser);
+  .patch(makeUserAdmin)
+  .delete(deleteUser);
 
-module.exports = router;
+export default router;
 
 /**
  * @swagger

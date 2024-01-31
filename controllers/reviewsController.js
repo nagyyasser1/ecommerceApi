@@ -1,6 +1,8 @@
-const { sequelize } = require("../models");
-const asyncHandler = require("express-async-handler");
-const STATUS_CODES = require("../constants/STATUS_CODES");
+import { sequelize } from "../models/index.js";
+import asyncHandler from "express-async-handler";
+import STATUS_CODES from "../constants/STATUS_CODES.js";
+
+const { NOT_FOUND, CREATED, INTERNAL_SERVER_ERROR, BAD_REQUEST, OK, FORBIDDEN } = STATUS_CODES;
 
 const addReview = asyncHandler(async (req, res) => {
   const { rating, comment, productId } = req.body;
@@ -15,7 +17,7 @@ const addReview = asyncHandler(async (req, res) => {
 
     if (!existingProduct) {
       return res
-        .status(STATUS_CODES.NOT_FOUND)
+        .status(NOT_FOUND)
         .json({ message: "Product does not exist!" });
     }
 
@@ -28,12 +30,12 @@ const addReview = asyncHandler(async (req, res) => {
     });
 
     return res
-      .status(STATUS_CODES.CREATED)
+      .status(CREATED)
       .json(newReview);
   } catch (error) {
     console.error("Error adding new review:", error);
     return res
-      .status(STATUS_CODES.INTERNAL_SERVER_ERROR)
+      .status(INTERNAL_SERVER_ERROR)
       .json({ message: "Internal Server Error" });
   }
 });
@@ -45,7 +47,7 @@ const deleteReview = asyncHandler(async (req, res) => {
 
   if (!reviewId) {
     return res
-      .status(STATUS_CODES.BAD_REQUEST)
+      .status(BAD_REQUEST)
       .json({ message: "All fields required." });
   }
 
@@ -54,7 +56,7 @@ const deleteReview = asyncHandler(async (req, res) => {
 
     if (!review) {
       return res
-        .status(STATUS_CODES.NOT_FOUND)
+        .status(NOT_FOUND)
         .json({ message: "Review not found." });
     }
 
@@ -63,17 +65,17 @@ const deleteReview = asyncHandler(async (req, res) => {
       // If yes, delete the review
       await review.destroy();
       return res
-        .status(STATUS_CODES.OK)
+        .status(OK)
         .json({ message: "Review deleted successfully." });
     } else {
       return res
-        .status(STATUS_CODES.FORBIDDEN)
+        .status(FORBIDDEN)
         .json({ message: "Unauthorized to delete this review." });
     }
   } catch (error) {
     console.error(error);
     return res
-      .status(STATUS_CODES.INTERNAL_SERVER_ERROR)
+      .status(INTERNAL_SERVER_ERROR)
       .json({ message: "Internal Server Error" });
   }
 });
@@ -84,7 +86,7 @@ const updateReview = asyncHandler(async (req, res) => {
 
   if (!reviewId || !rating || !comment) {
     return res
-      .status(STATUS_CODES.BAD_REQUEST)
+      .status(BAD_REQUEST)
       .json({ message: "updated data are required." });
   }
 
@@ -93,7 +95,7 @@ const updateReview = asyncHandler(async (req, res) => {
 
     if (!review) {
       return res
-        .status(STATUS_CODES.NOT_FOUND)
+        .status(NOT_FOUND)
         .json({ message: "Review not found." });
     }
 
@@ -106,22 +108,22 @@ const updateReview = asyncHandler(async (req, res) => {
       });
       await review.save();
       return res
-        .status(STATUS_CODES.OK)
+        .status(OK)
         .json({ message: "Review updated successfully." });
     } else {
       return res
-        .status(STATUS_CODES.FORBIDDEN)
+        .status(FORBIDDEN)
         .json({ message: "Unauthorized to update this review." });
     }
   } catch (error) {
     console.error(error);
     return res
-      .status(STATUS_CODES.INTERNAL_SERVER_ERROR)
+      .status(INTERNAL_SERVER_ERROR)
       .json({ message: "Internal Server Error" });
   }
 });
 
-module.exports = {
+export {
   addReview,
   deleteReview,
   updateReview,

@@ -1,6 +1,7 @@
-const asyncHandler = require("express-async-handler");
-const { sequelize } = require("../models");
-const STATUS_CODES = require("../constants/STATUS_CODES");
+import asyncHandler from "express-async-handler";
+import { sequelize } from "../models/index.js";
+import STATUS_CODES from "../constants/STATUS_CODES.js";
+const  { BAD_REQUEST, CREATED, SERVER_ERROR, NOT_FOUND, NO_CONTENT, SUCCESS } = STATUS_CODES;
 
 // @desc Add new Size
 // @route /size
@@ -18,7 +19,7 @@ const addSize = asyncHandler(async (req, res) => {
 
     if (existingSize) {
       return res
-        .status(STATUS_CODES.BAD_REQUEST)
+        .status(BAD_REQUEST)
         .json({ message: `Size: ${type} already exists!` });
     }
 
@@ -28,12 +29,12 @@ const addSize = asyncHandler(async (req, res) => {
     });
 
     return res
-      .status(STATUS_CODES.CREATED)
+      .status(CREATED)
       .json(newSize);
   } catch (error) {
     console.error("Error adding size:", error);
     return res
-      .status(STATUS_CODES.SERVER_ERROR)
+      .status(SERVER_ERROR)
       .json({ message: "Internal Server Error" });
   }
 });
@@ -50,18 +51,18 @@ const deleteSize = asyncHandler(async (req, res) => {
 
     if (!sizeToDelete) {
       return res
-        .status(STATUS_CODES.NOT_FOUND)
+        .status(NOT_FOUND)
         .json({ message: "Size not found" });
     }
 
     // Delete the size
     await sizeToDelete.destroy();
 
-    return res.status(STATUS_CODES.NO_CONTENT).send();
+    return res.status(NO_CONTENT).send();
   } catch (error) {
     console.error("Error deleting category:", error);
     return res
-      .status(STATUS_CODES.SERVER_ERROR)
+      .status(SERVER_ERROR)
       .json({ message: "Internal Server Error" });
   }
 });
@@ -73,11 +74,11 @@ const getAllSizes = asyncHandler(async (req, res) => {
   try {
     const sizes = await sequelize.models.Size.findAll();
 
-    return res.status(STATUS_CODES.SUCCESS).send(sizes);
+    return res.status(SUCCESS).send(sizes);
   } catch (error) {
     console.error("Error getting all sizes:", error);
     return res
-      .status(STATUS_CODES.SERVER_ERROR)
+      .status(SERVER_ERROR)
       .json({ message: "Internal Server Error" });
   }
 });
@@ -94,7 +95,7 @@ const updateSize = asyncHandler(async (req, res) => {
     const size = await sequelize.models.Size.findByPk(sizeId);
 
     if (!size) {
-      return res.status(STATUS_CODES.NOT_FOUND).json({
+      return res.status(NOT_FOUND).json({
         message: "size not found.",
       });
     }
@@ -105,16 +106,16 @@ const updateSize = asyncHandler(async (req, res) => {
     // Save the updated size
     await size.save();
 
-    return res.status(STATUS_CODES.SUCCESS).send(size);
+    return res.status(SUCCESS).send(size);
   } catch (error) {
     console.error("Error updating size:", error);
-    return res.status(STATUS_CODES.SERVER_ERROR).json({
+    return res.status(SERVER_ERROR).json({
       message: "Internal Server Error",
     });
   }
 });
 
-module.exports = {
+export  {
   addSize,
   deleteSize,
   getAllSizes,

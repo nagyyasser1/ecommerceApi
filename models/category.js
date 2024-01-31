@@ -1,19 +1,25 @@
-module.exports = (sequelize, DataTypes) => {
-    const Category = sequelize.define('Category', {
-        id: {
-            type: DataTypes.INTEGER,
-            primaryKey: true,
-            autoIncrement: true,
-            allowNull: false,
-        },
-        categoryName: {
-            type: DataTypes.STRING,
-            allowNull: false,
-        },
-        description: {
-            type: DataTypes.TEXT,
-        },
-    })
+// category.js
+import { DataTypes } from 'sequelize';
+import { sequelize } from './index.js';
 
-    return Category;
-}
+const defineCategoryModel = () => {
+  const Category = sequelize.define('Category', {
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
+      allowNull: false,
+    },
+    categoryName: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    description: {
+      type: DataTypes.TEXT,
+    },
+  });
+
+  return Category;
+};
+
+export default defineCategoryModel;

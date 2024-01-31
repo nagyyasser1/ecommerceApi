@@ -1,15 +1,15 @@
-const categoryController = require("../controllers/categoryController");
-const sizeController = require('../controllers/sizeController');
-const isAdmin = require("../middlewares/isAdmin");
-const { validateNewSizeData } = require("../utils/validations/size.validations");
-const router = require("express").Router();
+import { getAllSizes, addSize, updateSize, deleteSize } from '../controllers/sizeController.js';
+import isAdmin from "../middlewares/isAdmin.js";
+import { validateNewSizeData } from "../utils/validations/size.validations.js";
+import { Router } from 'express';
+const router = Router();
 
 router.use(isAdmin);
 
-router.get("/", sizeController.getAllSizes);
-router.post("/", validateNewSizeData, sizeController.addSize);
-router.patch("/", sizeController.updateSize);
-router.delete("/:sizeId", sizeController.deleteSize);
+router.get("/", getAllSizes);
+router.post("/", validateNewSizeData, addSize);
+router.patch("/", updateSize);
+router.delete("/:sizeId", deleteSize);
 
 
-module.exports = router;
+export default router;
