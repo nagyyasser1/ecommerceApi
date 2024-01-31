@@ -13,25 +13,16 @@ const defineProductSizeModel = () => {
       type: DataTypes.INTEGER,
       allowNull: false,
       defaultValue: 0,
+      unique: false
     },
     color: {
       type: DataTypes.STRING,
       allowNull: false,
+      unique: false
     },
-    ProductId: {
-      type: DataTypes.INTEGER,
-      references: {
-        model: 'Products',
-        key: 'id',
-      },
-    },
-    SizeId: {
-      type: DataTypes.INTEGER,
-      references: {
-        model: 'Sizes',
-        key: 'id',
-      },
-    },
+  }, {
+    timestamps: false,
+    primaryKey: ['ProductId','SizeId','color','quantity']
   });
 
   return ProductSize;

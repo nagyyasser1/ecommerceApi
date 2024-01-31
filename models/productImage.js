@@ -14,6 +14,8 @@ const defineProductImageModel = () => {
       type: DataTypes.STRING,
       allowNull: false,
     },
+  }, {
+    timestamps: false
   });
 
   return ProductImage;

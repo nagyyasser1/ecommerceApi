@@ -14,6 +14,8 @@ const defineSizeModel = () => {
       allowNull: false,
       unique: true,
     },
+  }, {
+    timestamps: false
   });
 
   return Size;

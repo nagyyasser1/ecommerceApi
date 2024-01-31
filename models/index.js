@@ -49,13 +49,20 @@ Category.hasMany(Product);
 Product.hasMany(ProductImage);
 Product.hasMany(Review);
 Product.belongsTo(Category);
-Product.belongsToMany(Size, { through: ProductSize });
+Product.belongsToMany(Size, {through: ProductSize});
+Product.hasMany(ProductSize);
 
 // Define ProductSize Associations
 ProductSize.hasMany(OrderItem);
+ProductSize.belongsTo(Product);
+ProductSize.belongsTo(Size);
+
 
 // Define Size Associations;
-Size.belongsToMany(Product, { through: ProductSize });
+Size.belongsToMany(Product, {through: ProductSize});
+Size.hasMany(ProductSize);
+
+
 
 // Define ProductImage Associations
 ProductImage.belongsTo(Product);

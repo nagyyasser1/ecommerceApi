@@ -18,6 +18,8 @@ const defineOrderItemModel = () => {
       type: DataTypes.DECIMAL(10, 2),
       allowNull: false,
     },
+  }, {
+    timestamps: false
   });
 
   return OrderItem;

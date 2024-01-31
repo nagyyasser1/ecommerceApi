@@ -2,11 +2,15 @@ import { sequelize } from "../models/index.js";
 import asyncHandler from "express-async-handler";
 import STATUS_CODES from "../constants/STATUS_CODES.js";
 import deleteFile from "../utils/deleteFile.js";
-import { join } from "path";
-import { categoryExists, sizesExist } from "../utils/validations/product.validations.js";
+; import { categoryExists, sizesExist } from "../utils/validations/product.validations.js";
 
 const { NOT_FOUND, SERVER_ERROR, CREATED, SUCCESS } = STATUS_CODES;
 
+import { join, dirname } from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 // @desc Add New product
 // @route /product
@@ -53,11 +57,10 @@ const addProduct = asyncHandler(async (req, res, next) => {
 
     for (let i = 0; i < sizes.length; i++) {
       await sequelize.models.ProductSize.create({
-        color: sizes[i].color,
-        quantity: sizes[i].quantity,
-        ProductId: sizes[i].ProductId,
         SizeId: sizes[i].sizeId,
-        ProductId: newProduct.id
+        ProductId: newProduct.id,
+        color: sizes[i].color,
+        quantity: sizes[i].quantity
       })
     }
 
@@ -207,9 +210,9 @@ const getProductById = asyncHandler(async (req, res) => {
         },
         {
           model: sequelize.models.Size,
-          // through: { 
-          //   attributes: ['quantity', 'color'], 
-          // }
+          through: { 
+            attributes: ['quantity', 'color'], 
+          }
         },
         {
           model: sequelize.models.ProductImage, as: "ProductImages", attributes: {

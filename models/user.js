@@ -42,6 +42,8 @@ const defineUserModel = () => {
       type: DataTypes.BOOLEAN,
       defaultValue: false,
     },
+  }, {
+    timestamps: false
   });
 
   // Hash the user's password before saving to the database

@@ -1,0 +1,4 @@
+2024/01/31 15:07:23	35713cbd-44e5-4e68-a4b5-2e0877a240b2	SequelizeDatabaseError: relation "Users" does not exist	POST	/api/users	undefined
+2024/01/31 15:49:37	7c61b6da-1cc5-4e88-8201-533658ed0c0f	ReferenceError: __dirname is not defined	GET	/	undefined
+2024/01/31 15:49:38	7fdbb4bc-0cf1-4a40-9627-b845c8a8a7d7	ReferenceError: __dirname is not defined	GET	/favicon.ico	undefined
+2024/01/31 20:15:02	250926b2-e23a-48b6-8bf4-288110225578	ReferenceError: __dirname is not defined	GET	/favicon.ico	undefined

@@ -17,6 +17,8 @@ const defineCategoryModel = () => {
     description: {
       type: DataTypes.TEXT,
     },
+  }, {
+    timestamps: false
   });
 
   return Category;

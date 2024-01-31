@@ -1,7 +1,13 @@
 import { v4 as uuid } from "uuid";
 import { existsSync } from "fs";
 import { promises as fsPromises } from "fs";
-import { join } from "path";
+import { join, dirname } from 'path';
+import { fileURLToPath } from 'url';
+
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
 
 function formatDateTimeToYYYYMMDDHHMMSS(date) {
   if (!(date instanceof Date) || isNaN(date)) {
