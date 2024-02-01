@@ -142,15 +142,15 @@ const getAllProducts = asyncHandler(async (req, res) => {
     // Calculate the offset based on the page and pageSize
     const offset = (page - 1) * pageSize;
 
-    // Define the where condition based on stockQuantity, categoryId, and searchQuery
+    // Define the where condition based on  categoryId, and searchQuery
     const whereCondition = {};
 
     if (categoryId) {
-      whereCondition.categoryId = categoryId;
+      whereCondition.CategoryId = categoryId;
     }
 
+    // Add condition to search for products with names containing the searchQuery
     if (searchQuery) {
-      // Add condition to search for products with names containing the searchQuery
       whereCondition.name = {
         [sequelize.Sequelize.Op.like]: `%${searchQuery}%`,
       };
@@ -159,7 +159,7 @@ const getAllProducts = asyncHandler(async (req, res) => {
     // Get all products with pagination and include associated fields (category, manufacturer, and reviews)
     const products = await sequelize.models.Product.findAll({
       attributes: {
-        exclude: ["categoryId", "manufacturerId", "createdAt", "updatedAt"],
+        exclude: ["CategoryId", "createdAt", "updatedAt"],
       },
       include: [
         {
@@ -169,13 +169,32 @@ const getAllProducts = asyncHandler(async (req, res) => {
             exclude: ["id", "createdAt", "updatedAt", "productId"],
           },
         },
+        {
+          model: sequelize.models.Category,
+          as: "Category",
+          attributes: {
+            exclude: ["createdAt", "updatedAt"]
+          }
+        },
       ],
       where: whereCondition,
       offset,
       limit: pageSize,
     });
 
-    return res.status(SUCCESS).json({ products });
+    const modifiedProducts = products.map(p => {
+      return{
+        id: p.id,
+        name: p.name,
+        description: p.description,
+        price: p.price,
+        featured: p.isFeatured,
+        category: p.Category.categoryName,
+        images: p.ProductImages.map(img => img.imageUrl),
+      }
+    })
+
+    return res.status(SUCCESS).json(modifiedProducts);
   } catch (error) {
     console.error("Error getting all products:", error);
     return res
@@ -210,7 +229,7 @@ const getProductById = asyncHandler(async (req, res) => {
         },
         {
           model: sequelize.models.ProductSize,
-          attributes: ["quantity","color"],
+          attributes: ["quantity", "color"],
           include: {
             model: sequelize.models.Size,
             attributes: ["type"]
