@@ -1,11 +1,12 @@
 import { Router } from "express";
 import isAdmin from "../middlewares/isAdmin.js";
-import { getAllProducts, getAllFeaturedProducts, getProductById, addProduct, saveFiles, updateProduct, deleteProduct } from "../controllers/productsController.js";
+import { getAllProducts, getAllFeaturedProducts, getProductById, addProduct, saveFiles, updateProduct, deleteProduct, updateProductSize, addProductSize, deleteProductSize } from "../controllers/productsController.js";
 import fileUpload from "express-fileupload";
 import filePayloadExists from "../middlewares/filesPayloadExists.js";
 import fileSizeLimiter from "../middlewares/fileSizeLimiter.js";
 import fileExtLimiter from "../middlewares/fileExtLimiter.js";
 import { validateProductData } from "../utils/validations/product.validations.js";
+import { validateNewProductSizeData } from "../utils/validations/productSize.validations.js"
 
 const router = Router();
 
@@ -337,7 +338,11 @@ router.post(
  *               example:
  *                 message: Internal Server Error
  */
-router.put("/:productId", isAdmin, updateProduct);
+router.patch("/:productId", isAdmin, updateProduct);
+
+router.post("/productsize", isAdmin, validateNewProductSizeData, addProductSize)
+router.patch("/productsize/:productSizeId", isAdmin, updateProductSize);
+router.delete("/productsize/:productSizeId",isAdmin, deleteProductSize)
 
 /**
  * @swagger

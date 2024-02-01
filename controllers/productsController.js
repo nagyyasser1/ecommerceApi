@@ -2,7 +2,7 @@ import { sequelize } from "../models/index.js";
 import asyncHandler from "express-async-handler";
 import STATUS_CODES from "../constants/STATUS_CODES.js";
 import deleteFile from "../utils/deleteFile.js";
-; import { categoryExists, sizesExist } from "../utils/validations/product.validations.js";
+import { categoryExists, sizesExist } from "../utils/validations/product.validations.js";
 
 const { NOT_FOUND, SERVER_ERROR, CREATED, SUCCESS } = STATUS_CODES;
 
@@ -183,7 +183,7 @@ const getAllProducts = asyncHandler(async (req, res) => {
     });
 
     const modifiedProducts = products.map(p => {
-      return{
+      return {
         id: p.id,
         name: p.name,
         description: p.description,
@@ -225,11 +225,15 @@ const getProductById = asyncHandler(async (req, res) => {
           as: "Reviews",
           attributes: {
             exclude: ["createdAt", "updatedAt"]
+          },
+          include: {
+            model: sequelize.models.User,
+            attributes: ["firstName", "lastName"]
           }
         },
         {
           model: sequelize.models.ProductSize,
-          attributes: ["quantity", "color"],
+          attributes: ["quantity", "color", "id"],
           include: {
             model: sequelize.models.Size,
             attributes: ["type"]
@@ -261,14 +265,18 @@ const getProductById = asyncHandler(async (req, res) => {
       reviews: product.Reviews.map((review) => ({
         rating: review.rating,
         comment: review.comment,
-        UserId: review.UserId,
+        user:{
+          id: review.UserId,
+          name: review.User.firstName +" "+ review.User.lastName,
+        }
       })),
       images: product.ProductImages.map((image) => image.imageUrl),
       sizes: product.ProductSizes.map((size) => {
         return {
-          type: size.Size.type,
+          productSizeId: size.id,
           color: size.color,
-          quantity: size.quantity
+          quantity: size.quantity,
+          type: size.Size.type,
         }
       })
     };
@@ -287,7 +295,7 @@ const getProductById = asyncHandler(async (req, res) => {
 // @access Privite
 const updateProduct = asyncHandler(async (req, res) => {
   const productId = req.params.productId;
-  const { name, description, price, stockQuantity, isFeatured } = req.body;
+  const { name, description, price, isFeatured, categoryId } = req.body;
 
   try {
     // Find the product by ID
@@ -300,21 +308,155 @@ const updateProduct = asyncHandler(async (req, res) => {
         .json({ message: "Product not found" });
     }
 
+    // check the category exists or not if not return 404;
+    if (categoryId) {
+      const categoryResult = await categoryExists(categoryId);
+
+      if (!categoryResult.isValid) {
+        return res
+          .status(NOT_FOUND)
+          .send(categoryResult.error);
+      }
+    }
     // Update the product details
     product.name = name || product.name;
     product.description = description || product.description;
     product.price = price || product.price;
-    product.stockQuantity = stockQuantity || product.stockQuantity;
     product.isFeatured = isFeatured || product.isFeatured;
+    product.CategoryId = categoryId || product.CategoryId;
 
     // Save the updated product
     await product.save();
 
     res
       .status(SUCCESS)
-      .json({ message: "Product updated successfully", product });
+      .json( product );
   } catch (error) {
     console.error("Error updating product:", error);
+    res
+      .status(SERVER_ERROR)
+      .json({ message: "Internal Server Error" });
+  }
+});
+
+// @desc update productSize {color or quantity only}
+// @route /product/:productId
+// @access Privite
+const updateProductSize = asyncHandler(async (req, res) => {
+  const productSizeId = req.params.productSizeId;
+
+  const { quantity, color} = req.body;
+
+  try {
+    // Find the product by ID
+    const productSize = await sequelize.models.ProductSize.findByPk(productSizeId);
+
+    // If the product doesn't exist
+    if (!productSize) {
+      return res
+        .status(NOT_FOUND)
+        .json({ message: "ProductSize not found!" });
+    }
+
+    // Update the productSize details
+    productSize.quantity = quantity || productSize.quantity;
+    productSize.color = color || productSize.color;
+   
+
+    // Save the updated product
+    await productSize.save();
+
+    res
+      .status(SUCCESS)
+      .json( productSize );
+  } catch (error) {
+    console.error("Error updating productSize:", error);
+    res
+      .status(SERVER_ERROR)
+      .json({ message: "Internal Server Error" });
+  }
+});
+
+// @desc add new ProductSize
+// @route /productsize
+// @access Privite
+const addProductSize = asyncHandler(async(req,res)=>{
+  const { quantity, color, ProductId, SizeId} = req.body;
+
+  try {
+  
+    // Find the product by ID
+    const product = await sequelize.models.Product.findByPk(ProductId);
+
+    // If the product doesn't exist
+    if (!product) {
+      return res
+        .status(NOT_FOUND)
+        .json({ message: "Product not found!" });
+    }
+
+    // Find the size by ID
+    const size = await sequelize.models.Size.findByPk(SizeId);
+
+    // If the size doesn't exist
+    if (!size) {
+      return res
+        .status(NOT_FOUND)
+        .json({ message: "Size not found!" });
+    }
+
+    try {
+      const newProductSize = await sequelize.models.ProductSize.create({
+        color,
+        quantity,
+        SizeId,
+        ProductId
+      })
+  
+      // Save the updated product
+      await newProductSize.save();
+
+      res
+      .status(SUCCESS)
+      .json( newProductSize );
+    } catch (error) {
+      res
+      .status(SERVER_ERROR)
+      .send(error);
+    }
+  } catch (error) {
+    console.error("Error updating product:", error);
+    res
+      .status(SERVER_ERROR)
+      .json({ message: "Internal Server Error" });
+  }
+})
+
+// @desc delete productSize
+// @route /productsize/:productsizeid
+// @access Privite
+const deleteProductSize = asyncHandler(async (req, res) => {
+  const productSizeId = req.params.productSizeId;
+
+  try {
+    // Find the product by ID
+    const productSize = await sequelize.models.ProductSize.findByPk(productSizeId);
+
+    // If the product doesn't exist
+    if (!productSize) {
+      return res
+        .status(NOT_FOUND)
+        .json({ message: "ProductSize not found" });
+    }
+
+
+    await productSize.destroy();
+
+    res
+      .status(SUCCESS)
+      .json({ message: "ProductSize deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting product:", error);
     res
       .status(SERVER_ERROR)
       .json({ message: "Internal Server Error" });
@@ -351,7 +493,12 @@ const deleteProduct = asyncHandler(async (req, res) => {
     };
 
     // Loop through productImages and delete associated files
-    await Promise.all(productImages.map(deleteImageFile));
+    try {
+      await Promise.all(productImages.map(deleteImageFile));
+
+    } catch (error) {
+      console.log(error)
+    }
 
     // Delete the product
     await sequelize.models.ProductImage.destroy({
@@ -405,6 +552,9 @@ export {
   getProductById,
   saveFiles,
   updateProduct,
+  updateProductSize,
+  addProductSize,
+  deleteProductSize,
   deleteProduct,
   getAllFeaturedProducts,
 };
