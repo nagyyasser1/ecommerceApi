@@ -1,4 +1,8 @@
-import { join } from "path";
+import { join, dirname } from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 const notFound = (req, res, next) => {
   res.status(404);
@@ -9,6 +13,6 @@ const notFound = (req, res, next) => {
   } else {
     res.type("txt").send("404 Not Found!");
   }
-};
+}; 
 
 export default notFound;

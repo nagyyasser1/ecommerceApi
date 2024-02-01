@@ -306,11 +306,11 @@ const updateProduct = asyncHandler(async (req, res) => {
 // @route /product/:productId
 // @access Privite
 const deleteProduct = asyncHandler(async (req, res) => {
-  const productId = req.params.productId;
+  const ProductId = req.params.productId;
 
   try {
     // Find the product by ID
-    const product = await sequelize.models.Product.findByPk(productId);
+    const product = await sequelize.models.Product.findByPk(ProductId);
 
     // If the product doesn't exist
     if (!product) {
@@ -322,7 +322,7 @@ const deleteProduct = asyncHandler(async (req, res) => {
     // Delete associated images in ProductImage table
     const productImages = await sequelize.models.ProductImage.findAll({
       where: {
-        productId: product.id,
+        ProductId: product.id,
       },
     });
 
@@ -337,9 +337,10 @@ const deleteProduct = asyncHandler(async (req, res) => {
     // Delete the product
     await sequelize.models.ProductImage.destroy({
       where: {
-        productId,
+        ProductId,
       },
     });
+
     await product.destroy();
 
     res
