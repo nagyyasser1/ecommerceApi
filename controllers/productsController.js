@@ -209,15 +209,15 @@ const getProductById = asyncHandler(async (req, res) => {
           }
         },
         {
-          model: sequelize.models.Size,
-          through: { 
-            attributes: ['quantity', 'color'], 
+          model: sequelize.models.ProductSize,
+          attributes: ["quantity","color"],
+          include: {
+            model: sequelize.models.Size,
+            attributes: ["type"]
           }
         },
         {
-          model: sequelize.models.ProductImage, as: "ProductImages", attributes: {
-            exclude: ["createdAt", "updatedAt"]
-          }
+          model: sequelize.models.ProductImage,
         },
       ],
       attributes: {
@@ -245,11 +245,11 @@ const getProductById = asyncHandler(async (req, res) => {
         UserId: review.UserId,
       })),
       images: product.ProductImages.map((image) => image.imageUrl),
-      sizes: product.Sizes.map((size) => {
+      sizes: product.ProductSizes.map((size) => {
         return {
-          type: size.type,
-          color: size.ProductSize.color,
-          quantity: size.ProductSize.quantity
+          type: size.Size.type,
+          color: size.color,
+          quantity: size.quantity
         }
       })
     };
