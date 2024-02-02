@@ -107,7 +107,7 @@ const addOrder = asyncHandler(async (req, res) => {
       order = await sequelize.models.Order.create(
         {
           UserId,
-          shipping_address: `city:${city},town:${town},street:${street}`,
+          shipping_address: `${city},${town},${street}`,
           total_amount: calcTotalPrice(productsWithStock),
         },
         { transaction: t }
@@ -123,10 +123,7 @@ const addOrder = asyncHandler(async (req, res) => {
       }
     });
 
-    return res.status(CREATED).json({
-      message: "Order added successfully",
-      order,
-    });
+    return res.status(CREATED).send(order);
   } catch (error) {
     console.error("Error adding new order:", error);
     // Send detailed error message to the client
@@ -165,23 +162,65 @@ const updateOrderStatus = asyncHandler(async (req, res) => {
   }
 });
 
-const getAllOrders = asyncHandler(async (req, res) => {
+const getAllOrders = asyncHandler(async (req, res, next) => {
+  const { isAdmin, id: userId } = req.user;
+
+  const whereCondition = {};
+  console.log("isAdmin", isAdmin);
+
+  if (!isAdmin) {
+    whereCondition["UserId"] = userId;
+  }
+
   try {
-    // Find all orders and include associated data (e.g., order items)
     const orders = await sequelize.models.Order.findAll({
+      where: whereCondition,
       include: [
         {
           model: sequelize.models.OrderItem,
-          include: [sequelize.models.Product],
+          attributes: {
+            exclude: ["id", "OrderId", "ProductSizeId"],
+          },
+          include: {
+            model: sequelize.models.ProductSize,
+            include: [
+              { model: sequelize.models.Product },
+              { model: sequelize.models.Size },
+            ],
+          },
         },
-        sequelize.models.User, // Include associated user
+        {
+          model: sequelize.models.User,
+          attributes: ["id", "phone", "address", "firstName", "lastName"],
+        },
       ],
+      attributes: {
+        exclude: ["UserId"],
+      },
     });
 
-    return res.status(SUCCESS).json({
-      message: "Orders retrieved successfully",
-      orders,
+    const modifiedOrders = orders.map((order) => {
+      return {
+        id: order.id,
+        totalAmount: order.total_amount,
+        status: order.status,
+        shippingAddress: order.shipping_address,
+        createdAt: order.createdAt,
+        updatedAt: order.updatedAt,
+        user: order.User,
+        orderItems: order.OrderItems.map((item) => {
+          return {
+            productId: item.ProductSize.Product.id,
+            productName: item.ProductSize.Product.name,
+            quantity: item.quantity,
+            subtotal: item.subtotal,
+            color: item.ProductSize.color,
+            size: item.ProductSize.Size.type,
+          };
+        }),
+      };
     });
+    return res.status(SUCCESS).send(modifiedOrders);
   } catch (error) {
     console.error("Error getting all orders:", error);
     return res.status(SERVER_ERROR).json({ message: "Internal Server Error" });
@@ -189,13 +228,12 @@ const getAllOrders = asyncHandler(async (req, res) => {
 });
 
 const getMyOrders = asyncHandler(async (req, res) => {
-  const userId = req.user.id;
+  const UserId = req.user.id;
 
   try {
-    // Find all orders associated with the user
     const orders = await sequelize.models.Order.findAll({
-      where: { userId },
-      include: [sequelize.models.OrderItem], // Include associated order items in the query
+      where: { UserId },
+      include: [sequelize.models.OrderItem],
     });
 
     if (!orders || orders.length === 0) {
@@ -204,10 +242,7 @@ const getMyOrders = asyncHandler(async (req, res) => {
         .json({ message: "No orders found for the user" });
     }
 
-    res.status(SUCCESS).json({
-      message: "Orders retrieved successfully",
-      orders,
-    });
+    res.status(SUCCESS).send(orders);
   } catch (error) {
     console.error("Error retrieving orders:", error);
     res.status(SERVER_ERROR).json({ message: "Internal Server Error" });

@@ -26,7 +26,6 @@ const validateNewOrderData = (req, res, next) => {
   if (error) {
     return res.status(STATUS_CODES.UNPROCESSABLE_ENTITY).send(error.details[0]); // Send specific error detail
   }
-  console.log("Validation successful:", req.body); // Log validated data
   next();
 };
 

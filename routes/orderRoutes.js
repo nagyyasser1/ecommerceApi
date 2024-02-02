@@ -112,7 +112,7 @@ router.post("/", verifyJWT, validateNewOrderData, addOrder);
  *                   message: Internal Server Error
  */
 
-router.get("/myorders", verifyJWT, getMyOrders);
+// router.get("/myorders", verifyJWT, getMyOrders);
 
 /**
  * @swagger
@@ -142,7 +142,7 @@ router.get("/myorders", verifyJWT, getMyOrders);
  *                   message: Internal Server Error
  */
 
-router.get("/", isAdmin, getAllOrders);
+router.get("/", verifyJWT, getAllOrders);
 
 /**
  * @swagger
