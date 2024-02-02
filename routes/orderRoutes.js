@@ -80,42 +80,6 @@ router.post("/", verifyJWT, validateNewOrderData, addOrder);
 
 /**
  * @swagger
- * /api/orders/myorders:
- *   get:
- *      tags: [Order]
- *      description: Get User's Orders
- *      summary: get user's orders
- *      security:
- *        - bearerAuth: []  # Use if authentication is required
- *      responses:
- *           200:
- *             description: Orders retrieved successfully
- *             content:
- *               application/json:
- *                 example:
- *                   message: Orders retrieved successfully
- *                   orders:
- *                     type: array
- *                     items:
- *                       $ref: '#/components/schemas/Order'  # Reference to the Order schema
- *           404:
- *             description: No orders found for the user
- *             content:
- *               application/json:
- *                 example:
- *                   message: No orders found for the user
- *           500:
- *             description: Internal Server Error
- *             content:
- *               application/json:
- *                 example:
- *                   message: Internal Server Error
- */
-
-// router.get("/myorders", verifyJWT, getMyOrders);
-
-/**
- * @swagger
  * /api/orders:
  *   get:
  *      tags: [Order]
@@ -193,7 +157,7 @@ router.get("/", verifyJWT, getAllOrders);
  *                   message: Internal Server Error
  */
 
-router.put("/", isAdmin, updateOrderStatus);
+router.patch("/status", isAdmin, updateOrderStatus);
 
 /**
  * @swagger

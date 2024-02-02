@@ -139,7 +139,7 @@ const updateOrderStatus = asyncHandler(async (req, res) => {
 
   try {
     // Find the order by ID
-    const order = await sequelize.models.Order.finsequelize.modelsyPk(orderId);
+    const order = await sequelize.models.Order.findByPk(orderId);
 
     // If the order doesn't exist
     if (!order) {
@@ -147,15 +147,12 @@ const updateOrderStatus = asyncHandler(async (req, res) => {
     }
 
     // Update the status field
-    order.orderStatus = status;
+    order.status = status;
 
     // Save the changes to the database
     await order.save();
 
-    return res.status(SUCCESS).json({
-      message: "Order status updated successfully",
-      order,
-    });
+    return res.status(SUCCESS).send(order);
   } catch (error) {
     console.error("Error updating order status:", error);
     return res.status(SERVER_ERROR).json({ message: "Internal Server Error" });
@@ -166,7 +163,6 @@ const getAllOrders = asyncHandler(async (req, res, next) => {
   const { isAdmin, id: userId } = req.user;
 
   const whereCondition = {};
-  console.log("isAdmin", isAdmin);
 
   if (!isAdmin) {
     whereCondition["UserId"] = userId;
