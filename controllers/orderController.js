@@ -223,28 +223,6 @@ const getAllOrders = asyncHandler(async (req, res, next) => {
   }
 });
 
-const getMyOrders = asyncHandler(async (req, res) => {
-  const UserId = req.user.id;
-
-  try {
-    const orders = await sequelize.models.Order.findAll({
-      where: { UserId },
-      include: [sequelize.models.OrderItem],
-    });
-
-    if (!orders || orders.length === 0) {
-      return res
-        .status(NOT_FOUND)
-        .json({ message: "No orders found for the user" });
-    }
-
-    res.status(SUCCESS).send(orders);
-  } catch (error) {
-    console.error("Error retrieving orders:", error);
-    res.status(SERVER_ERROR).json({ message: "Internal Server Error" });
-  }
-});
-
 const deleteOrder = asyncHandler(async (req, res) => {
   const orderId = req.body.orderId;
   const userId = req.user.id;
@@ -280,27 +258,34 @@ const deleteOrder = asyncHandler(async (req, res) => {
   }
 });
 
-// Function to cancel an order
 const cancelOrder = asyncHandler(async (req, res) => {
   const orderId = req.params.orderId;
-  const userId = req.user.id;
-  const { isAdmin } = req.user;
+  const { id: UserId, isAdmin } = req.user;
+
+  const whereCondition = {};
+
+  if (!isAdmin) {
+    whereCondition["id"] = orderId;
+    whereCondition["UserId"] = UserId;
+  } else {
+    whereCondition["id"] = orderId;
+  }
 
   try {
     // Find the order
     const order = await sequelize.models.Order.findOne({
-      where: {
-        id: orderId,
-        userId,
-      },
+      where: whereCondition,
       include: [
         {
           model: sequelize.models.OrderItem,
           as: "OrderItems",
           include: [
             {
-              model: sequelize.models.Product,
-              as: "Product",
+              model: sequelize.models.ProductSize,
+              as: "ProductSize",
+              include: {
+                model: sequelize.models.Size,
+              },
             },
           ],
         },
@@ -308,54 +293,47 @@ const cancelOrder = asyncHandler(async (req, res) => {
     });
 
     // Check if order and order.orderItems exist
-    if (!order || !order?.OrderItems) {
+    if (!order) {
       return res.status(NOT_FOUND).json({
         message: "Order not found",
       });
     }
 
-    if (order.orderStatus === SHIPPED && !isAdmin) {
+    if (order.status === SHIPPED && !isAdmin) {
       return res.status(FORBIDDEN).json({
         message: "Can't cancel shipped order!",
       });
     }
 
-    // Restock products and delete order items
-    await sequelize.models.sequelize.transaction(async (t) => {
-      for (const orderItem of order.OrderItems) {
-        if (orderItem.Product) {
-          const { Product: product, quantity } = orderItem;
+    const OrderItems = order.OrderItems.map((item) => {
+      return {
+        ProductSizeId: item.ProductSize.id,
+        quantity: item.quantity,
+        color: item.ProductSize.color,
+        type: item.ProductSize.Size.type,
+      };
+    });
 
-          // Restock product quantity
-          await sequelize.models.Product.increment("stockQuantity", {
-            by: quantity,
-            where: { id: product.id },
+    await sequelize.transaction(async (t) => {
+      for (let i = 0; i < OrderItems.length; i++) {
+        const productsize = await sequelize.models.ProductSize.findByPk(
+          OrderItems[i].ProductSizeId,
+          {
             transaction: t,
-          });
-        }
-
-        // Delete order item
-        await orderItem.destroy({ transaction: t });
+          }
+        );
+        productsize.quantity += OrderItems[i].quantity;
+        await productsize.save({ transaction: t });
       }
 
-      // Delete the order
       await order.destroy({ transaction: t });
     });
 
-    return res.status(SUCCESS).json({
-      message: "Order canceled successfully",
-    });
+    res.status(SUCCESS).send();
   } catch (error) {
     console.error("Error canceling order:", error);
     return res.status(SERVER_ERROR).json({ message: "Internal Server Error" });
   }
 });
 
-export {
-  addOrder,
-  updateOrderStatus,
-  getAllOrders,
-  getMyOrders,
-  deleteOrder,
-  cancelOrder,
-};
+export { addOrder, updateOrderStatus, getAllOrders, deleteOrder, cancelOrder };

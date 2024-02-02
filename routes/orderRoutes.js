@@ -1,7 +1,6 @@
 import verifyJWT from "../middlewares/verifyJWT.js";
 import {
   addOrder,
-  getMyOrders,
   getAllOrders,
   updateOrderStatus,
   cancelOrder,
@@ -9,6 +8,7 @@ import {
 import { Router } from "express";
 import isAdmin from "../middlewares/isAdmin.js";
 import { validateNewOrderData } from "../utils/validations/order.validations.js";
+
 const router = Router();
 
 /**
@@ -203,7 +203,7 @@ router.patch("/status", isAdmin, updateOrderStatus);
  *               message: Internal Server Error
  */
 
-router.patch("/cancel/:orderId", verifyJWT, cancelOrder);
+router.delete("/cancel/:orderId", verifyJWT, cancelOrder);
 
 export default router;
 

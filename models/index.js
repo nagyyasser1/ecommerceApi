@@ -1,19 +1,19 @@
-import { Sequelize, DataTypes } from 'sequelize';
-import environment from '../config/config.js';
+import { Sequelize, DataTypes } from "sequelize";
+import environment from "../config/config.js";
 
 // Create New Sequelize Instance
 export const sequelize = new Sequelize(environment.development);
 
 // Import and define associations
-import defineProductModel from './product.js';
-import defineSizeModel from './size.js';
-import defineProductSizeModel from './productSize.js';
-import defineProductImageModel from './productImage.js';
-import defineUserModel from './user.js';
-import defineCategoryModel from './category.js';
-import defineOrderModel from './order.js';
-import defineOrderItemModel from './orderItem.js';
-import defineReviewModel from './review.js';
+import defineProductModel from "./product.js";
+import defineSizeModel from "./size.js";
+import defineProductSizeModel from "./productSize.js";
+import defineProductImageModel from "./productImage.js";
+import defineUserModel from "./user.js";
+import defineCategoryModel from "./category.js";
+import defineOrderModel from "./order.js";
+import defineOrderItemModel from "./orderItem.js";
+import defineReviewModel from "./review.js";
 
 // Define models
 const Product = defineProductModel();
@@ -31,7 +31,9 @@ User.hasMany(Order);
 User.hasMany(Review);
 
 // Define Order Associations
-Order.hasMany(OrderItem);
+Order.hasMany(OrderItem, {
+  onDelete: "CASCADE",
+});
 Order.belongsTo(User);
 
 // Define OrderItem Associations
@@ -57,12 +59,9 @@ ProductSize.hasMany(OrderItem);
 ProductSize.belongsTo(Product);
 ProductSize.belongsTo(Size);
 
-
 // Define Size Associations;
 // Size.belongsToMany(Product, { through: ProductSize });
 Size.hasMany(ProductSize);
-
-
 
 // Define ProductImage Associations
 ProductImage.belongsTo(Product);
