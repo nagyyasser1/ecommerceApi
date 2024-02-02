@@ -1,92 +1,87 @@
-import Joi from 'joi';
+import Joi from "joi";
 
-import { sequelize } from '../../models/index.js';
-import STATUS_CODES from '../../constants/STATUS_CODES.js';
+import { sequelize } from "../../models/index.js";
+import STATUS_CODES from "../../constants/STATUS_CODES.js";
 
 const schema = Joi.object({
-    name: Joi.string().required(),
-    description: Joi.string().required(),
-    price: Joi.number().required(),
-    categoryId: Joi.number().required(),
-    isFeatured: Joi.boolean().required(),
-    sizes: Joi.array().items(
-        Joi.object({
-            quantity: Joi.number().required(),
-            sizeId: Joi.string().required(),
-            color: Joi.string().required()
-        })
-    )
+  name: Joi.string().required(),
+  description: Joi.string().required(),
+  price: Joi.number().required(),
+  categoryId: Joi.number().required(),
+  isFeatured: Joi.boolean().required(),
+  sizes: Joi.array().items(
+    Joi.object({
+      quantity: Joi.number().required(),
+      sizeId: Joi.string().required(),
+      color: Joi.string().required().trim(),
+    })
+  ),
 });
 
 const validateProductData = (req, res, next) => {
+  const sizesStr = req.body?.sizes;
 
-    const sizesStr = req.body?.sizes;
+  const sizesArr = JSON.parse(sizesStr);
 
-    const sizesArr = JSON.parse(sizesStr);
+  const theNewBody = { ...req.body, sizes: sizesArr };
 
+  const validationResult = schema.validate(theNewBody);
 
-    const theNewBody = {...req.body, sizes: sizesArr}
-    
-    const validationResult = schema.validate(theNewBody);
+  if (validationResult.error) {
+    return res
+      .status(STATUS_CODES.UNPROCESSABLE_ENTITY)
+      .send(validationResult.error);
+  }
 
-    if (validationResult.error) {
-        return res.status(STATUS_CODES.UNPROCESSABLE_ENTITY).send(validationResult.error);
-    };
+  req.body.sizes = sizesArr;
 
-    req.body.sizes = sizesArr;
-
-    next();
+  next();
 };
 
 const sizesExist = async (sizes) => {
-    const errors = [];
+  const errors = [];
 
-    for (const sizeData of sizes) {
-        const { sizeId } = sizeData;
+  for (const sizeData of sizes) {
+    const { sizeId } = sizeData;
 
-        const sizeExists = await sequelize.models.Size.findByPk(sizeId);
-        if (!sizeExists) {
-            errors.push(`Size with sizeId '${sizeId}' does not exist in the database.`);
-        }
+    const sizeExists = await sequelize.models.Size.findByPk(sizeId);
+    if (!sizeExists) {
+      errors.push(
+        `Size with sizeId '${sizeId}' does not exist in the database.`
+      );
     }
+  }
 
-    if (errors.length > 0) {
-        return {
-            isValid: false,
-            error: errors
-        };
-    }
+  if (errors.length > 0) {
+    return {
+      isValid: false,
+      error: errors,
+    };
+  }
 
-    return { isValid: true };
+  return { isValid: true };
 };
-
 
 const categoryExists = async (categoryId) => {
-    try {
-        const category = await sequelize.models.Category.findByPk(categoryId);
+  try {
+    const category = await sequelize.models.Category.findByPk(categoryId);
 
-        if (!category) {
-            return {
-                isValid: false,
-                error: `Category with ID ${categoryId} not found!`
-            };
-        }else{
-            return {
-                isValid: true
-            };
-        }
-
-    } catch (error) {
-        return {
-            isValid: false,
-            error: `Error while checking category existence: ${error.message}`
-        };
+    if (!category) {
+      return {
+        isValid: false,
+        error: `Category with ID ${categoryId} not found!`,
+      };
+    } else {
+      return {
+        isValid: true,
+      };
     }
+  } catch (error) {
+    return {
+      isValid: false,
+      error: `Error while checking category existence: ${error.message}`,
+    };
+  }
 };
 
-
-export  {
-    validateProductData,
-    sizesExist,
-    categoryExists
-}
+export { validateProductData, sizesExist, categoryExists };

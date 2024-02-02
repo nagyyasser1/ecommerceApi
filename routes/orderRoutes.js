@@ -1,7 +1,14 @@
 import verifyJWT from "../middlewares/verifyJWT.js";
-import { addOrder, getMyOrders, getAllOrders, updateOrderStatus, cancelOrder } from "../controllers/orderController.js";
+import {
+  addOrder,
+  getMyOrders,
+  getAllOrders,
+  updateOrderStatus,
+  cancelOrder,
+} from "../controllers/orderController.js";
 import { Router } from "express";
 import isAdmin from "../middlewares/isAdmin.js";
+import { validateNewOrderData } from "../utils/validations/order.validations.js";
 const router = Router();
 
 /**
@@ -69,7 +76,7 @@ const router = Router();
  *                   message: Internal Server Error
  */
 
-router.post("/", verifyJWT, addOrder);
+router.post("/", verifyJWT, validateNewOrderData, addOrder);
 
 /**
  * @swagger

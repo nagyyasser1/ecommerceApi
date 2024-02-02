@@ -1,0 +1,478 @@
+{
+    "client": "Thunder Client",
+    "collectionName": "ecommerceApi",
+    "dateExported": "2024-02-02T08:03:26.748Z",
+    "version": "1.1",
+    "folders": [
+        {
+            "_id": "911ce752-acba-4726-8808-d8177ede9b24",
+            "name": "auth",
+            "containerId": "",
+            "created": "2024-01-30T06:50:19.963Z",
+            "sortNum": 10000
+        },
+        {
+            "_id": "973cec40-d682-4bc9-beca-4d125fef470f",
+            "name": "user",
+            "containerId": "",
+            "created": "2024-01-30T06:51:50.745Z",
+            "sortNum": 20000
+        },
+        {
+            "_id": "4b32af8c-4fdd-4320-976e-458cfcc71de9",
+            "name": "category",
+            "containerId": "",
+            "created": "2024-01-30T08:05:22.808Z",
+            "sortNum": 30000
+        },
+        {
+            "_id": "01e6138d-86f4-479f-a1a9-a2c3030f8f00",
+            "name": "size",
+            "containerId": "",
+            "created": "2024-01-30T08:07:14.791Z",
+            "sortNum": 40000
+        },
+        {
+            "_id": "8f814749-46cb-4b75-ad44-8b6f40ebee77",
+            "name": "review",
+            "containerId": "",
+            "created": "2024-01-30T08:39:42.597Z",
+            "sortNum": 50000
+        },
+        {
+            "_id": "0ee2eaff-a31c-4d28-a17c-d37d3e590da0",
+            "name": "contact",
+            "containerId": "",
+            "created": "2024-01-30T09:04:43.515Z",
+            "sortNum": 60000
+        },
+        {
+            "_id": "7742248c-c40c-4bc1-b28f-530441390552",
+            "name": "product",
+            "containerId": "",
+            "created": "2024-01-30T12:45:26.502Z",
+            "sortNum": 70000
+        },
+        {
+            "_id": "a5f547ca-239c-4c5d-ae81-e8eaf2390286",
+            "name": "order",
+            "containerId": "",
+            "created": "2024-01-30T12:45:44.563Z",
+            "sortNum": 80000
+        },
+        {
+            "_id": "96036c1a-3490-4b1e-a877-7410b096265d",
+            "name": "productSize",
+            "containerId": "7742248c-c40c-4bc1-b28f-530441390552",
+            "created": "2024-02-01T18:47:39.740Z",
+            "sortNum": 90000
+        },
+        {
+            "_id": "fb7ed203-bfdc-49d0-b9ef-0fe94b6cfc32",
+            "name": "productImage",
+            "containerId": "7742248c-c40c-4bc1-b28f-530441390552",
+            "created": "2024-02-02T07:07:51.081Z",
+            "sortNum": 100000
+        }
+    ],
+    "requests": [
+        {
+            "_id": "bb41fb9b-e2ec-4d8b-9064-29136e32bd7d",
+            "colId": "6bb231b2-7742-4537-a3f2-fa4de582f985",
+            "containerId": "911ce752-acba-4726-8808-d8177ede9b24",
+            "name": "login",
+            "url": "{{eurl}}/auth/",
+            "method": "POST",
+            "sortNum": 10000,
+            "created": "2024-01-30T06:51:35.763Z",
+            "modified": "2024-01-30T07:52:25.397Z",
+            "headers": [],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"email\":\"nagyy8751@gmail.com\",\n  \"password\":\"Nagy123.com\"\n}",
+                "form": []
+            },
+            "tests": []
+        },
+        {
+            "_id": "0d791b16-3727-4fcc-83a9-6376a162e43d",
+            "colId": "6bb231b2-7742-4537-a3f2-fa4de582f985",
+            "containerId": "7742248c-c40c-4bc1-b28f-530441390552",
+            "name": "create",
+            "url": "{{eurl}}/api/products",
+            "method": "POST",
+            "sortNum": 10000,
+            "created": "2024-01-30T12:45:18.394Z",
+            "modified": "2024-01-30T13:48:18.385Z",
+            "headers": [
+                {
+                    "name": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"name\": \"t-shirt\",\n  \"description\": \"made with high quilty\",\n  \"price\": 66,\n  \"isFeatured\": true\n}",
+                "form": []
+            },
+            "tests": []
+        },
+        {
+            "_id": "1cb5ca3e-a0ea-460e-93e9-44582c6af28a",
+            "colId": "6bb231b2-7742-4537-a3f2-fa4de582f985",
+            "containerId": "973cec40-d682-4bc9-beca-4d125fef470f",
+            "name": "register",
+            "url": "{{eurl}}/api/users",
+            "method": "POST",
+            "sortNum": 20000,
+            "created": "2024-01-30T06:51:58.986Z",
+            "modified": "2024-01-30T07:35:20.070Z",
+            "headers": [],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"firstName\":\"nagy\",\n  \"lastName\":\"yasser\",\n  \"email\":\"nagyy8751@gmail.com\",\n  \"phone\": \"01094066795\",\n  \"address\":\"geneva\",\n  \"password\":\"Nagy123.com\"\n}",
+                "form": []
+            },
+            "tests": []
+        },
+        {
+            "_id": "5ee21e4d-ea3a-4e34-861f-a8a918fc4c6b",
+            "colId": "6bb231b2-7742-4537-a3f2-fa4de582f985",
+            "containerId": "911ce752-acba-4726-8808-d8177ede9b24",
+            "name": "refresh",
+            "url": "{{eurl}}/auth/refresh",
+            "method": "GET",
+            "sortNum": 30000,
+            "created": "2024-01-30T07:53:23.701Z",
+            "modified": "2024-01-30T07:53:39.663Z",
+            "headers": [],
+            "params": [],
+            "tests": []
+        },
+        {
+            "_id": "b1b03b29-3721-4520-8362-ab0b243031bc",
+            "colId": "6bb231b2-7742-4537-a3f2-fa4de582f985",
+            "containerId": "911ce752-acba-4726-8808-d8177ede9b24",
+            "name": "logout",
+            "url": "{{eurl}}/auth/logout",
+            "method": "POST",
+            "sortNum": 40000,
+            "created": "2024-01-30T07:55:59.725Z",
+            "modified": "2024-01-30T07:56:15.319Z",
+            "headers": [],
+            "params": [],
+            "tests": []
+        },
+        {
+            "_id": "87a5b0cb-c244-4212-8147-b50f6d3d1ee7",
+            "colId": "6bb231b2-7742-4537-a3f2-fa4de582f985",
+            "containerId": "4b32af8c-4fdd-4320-976e-458cfcc71de9",
+            "name": "create",
+            "url": "{{eurl}}/api/category",
+            "method": "POST",
+            "sortNum": 50000,
+            "created": "2024-01-30T08:05:35.006Z",
+            "modified": "2024-02-01T09:19:09.489Z",
+            "headers": [
+                {
+                    "name": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"categoryName\":\"kids\",\n  \"description\":\"all about kids\"\n}",
+                "form": []
+            },
+            "tests": []
+        },
+        {
+            "_id": "dd94c9e9-9e6d-4366-a3de-ace1b06e75d9",
+            "colId": "6bb231b2-7742-4537-a3f2-fa4de582f985",
+            "containerId": "01e6138d-86f4-479f-a1a9-a2c3030f8f00",
+            "name": "create",
+            "url": "{{eurl}}/api/size",
+            "method": "POST",
+            "sortNum": 60000,
+            "created": "2024-01-30T08:07:33.716Z",
+            "modified": "2024-02-01T09:18:43.205Z",
+            "headers": [
+                {
+                    "name": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"type\":\"large\"\n}",
+                "form": []
+            },
+            "tests": []
+        },
+        {
+            "_id": "0fc4a533-5ede-47f1-bc55-6368b2b808eb",
+            "colId": "6bb231b2-7742-4537-a3f2-fa4de582f985",
+            "containerId": "01e6138d-86f4-479f-a1a9-a2c3030f8f00",
+            "name": "find",
+            "url": "{{eurl}}/api/size",
+            "method": "GET",
+            "sortNum": 70000,
+            "created": "2024-01-30T08:36:47.326Z",
+            "modified": "2024-01-30T08:37:07.319Z",
+            "headers": [
+                {
+                    "name": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                }
+            ],
+            "params": [],
+            "tests": []
+        },
+        {
+            "_id": "1be32fb4-5d9f-45d0-bcbb-1897f3a3a4e9",
+            "colId": "6bb231b2-7742-4537-a3f2-fa4de582f985",
+            "containerId": "4b32af8c-4fdd-4320-976e-458cfcc71de9",
+            "name": "find",
+            "url": "{{eurl}}/api/category",
+            "method": "GET",
+            "sortNum": 80000,
+            "created": "2024-01-30T08:37:22.863Z",
+            "modified": "2024-01-30T08:37:42.929Z",
+            "headers": [
+                {
+                    "name": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                }
+            ],
+            "params": [],
+            "tests": []
+        },
+        {
+            "_id": "e4f36de3-7565-4370-9802-d9c13d9cafe1",
+            "colId": "6bb231b2-7742-4537-a3f2-fa4de582f985",
+            "containerId": "8f814749-46cb-4b75-ad44-8b6f40ebee77",
+            "name": "write",
+            "url": "{{eurl}}/api/review",
+            "method": "POST",
+            "sortNum": 90000,
+            "created": "2024-01-30T08:39:52.007Z",
+            "modified": "2024-02-01T15:00:04.733Z",
+            "headers": [
+                {
+                    "name": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"rating\": 4,\n  \"comment\": \"this jacket is realy awesome\",\n  \"productId\": 4\n}",
+                "form": []
+            },
+            "tests": []
+        },
+        {
+            "_id": "6ef91486-3ab7-4754-a802-86642a12da0a",
+            "colId": "6bb231b2-7742-4537-a3f2-fa4de582f985",
+            "containerId": "0ee2eaff-a31c-4d28-a17c-d37d3e590da0",
+            "name": "new",
+            "url": "{{eurl}}/contact",
+            "method": "POST",
+            "sortNum": 100000,
+            "created": "2024-01-30T09:05:00.370Z",
+            "modified": "2024-01-31T07:18:11.715Z",
+            "headers": [
+                {
+                    "name": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"name\":\"Alice\",\n  \"email\":\"tyasser900@gmail.com\",\n  \"subject\":\"funny\",\n  \"message\":\"good hands\"\n}",
+                "form": []
+            },
+            "tests": []
+        },
+        {
+            "_id": "017647cb-8b0f-4ffa-b05f-243d956fc3c9",
+            "colId": "6bb231b2-7742-4537-a3f2-fa4de582f985",
+            "containerId": "7742248c-c40c-4bc1-b28f-530441390552",
+            "name": "find All",
+            "url": "{{eurl}}/api/products/4",
+            "method": "GET",
+            "sortNum": 120000,
+            "created": "2024-01-30T16:29:25.266Z",
+            "modified": "2024-02-01T17:54:46.368Z",
+            "headers": [],
+            "params": [],
+            "tests": []
+        },
+        {
+            "_id": "147f86bd-d7a5-4db4-859b-529ea72d1b11",
+            "colId": "6bb231b2-7742-4537-a3f2-fa4de582f985",
+            "containerId": "7742248c-c40c-4bc1-b28f-530441390552",
+            "name": "get by id",
+            "url": "{{eurl}}/api/products/1",
+            "method": "GET",
+            "sortNum": 130000,
+            "created": "2024-01-30T19:45:10.010Z",
+            "modified": "2024-02-02T07:36:45.991Z",
+            "headers": [],
+            "params": [],
+            "tests": []
+        },
+        {
+            "_id": "63d8f94f-345d-4050-8ddf-a38bfad4c319",
+            "colId": "6bb231b2-7742-4537-a3f2-fa4de582f985",
+            "containerId": "7742248c-c40c-4bc1-b28f-530441390552",
+            "name": "delete",
+            "url": "{{eurl}}/api/products/7",
+            "method": "DELETE",
+            "sortNum": 140000,
+            "created": "2024-02-01T06:40:45.827Z",
+            "modified": "2024-02-01T17:51:41.143Z",
+            "headers": [
+                {
+                    "name": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                }
+            ],
+            "params": [],
+            "tests": []
+        },
+        {
+            "_id": "ead813dc-b7e4-44ca-a7d5-4854ec15ba58",
+            "colId": "6bb231b2-7742-4537-a3f2-fa4de582f985",
+            "containerId": "7742248c-c40c-4bc1-b28f-530441390552",
+            "name": "update basic data",
+            "url": "{{eurl}}/api/products/5",
+            "method": "PATCH",
+            "sortNum": 150000,
+            "created": "2024-02-01T18:02:33.982Z",
+            "modified": "2024-02-01T18:07:27.189Z",
+            "headers": [
+                {
+                    "name": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"description\":\"zara brand\",\n  \"price\": 1999,\n  \"categoryId\": 1,\n  \"name\":\"jacket\"\n}",
+                "form": []
+            },
+            "tests": []
+        },
+        {
+            "_id": "3189bf00-6bb2-4ce1-9787-cf043124f72f",
+            "colId": "6bb231b2-7742-4537-a3f2-fa4de582f985",
+            "containerId": "96036c1a-3490-4b1e-a877-7410b096265d",
+            "name": "update",
+            "url": "{{eurl}}/api/products/productsize/7",
+            "method": "PATCH",
+            "sortNum": 170000,
+            "created": "2024-02-01T18:47:46.083Z",
+            "modified": "2024-02-01T18:51:13.168Z",
+            "headers": [
+                {
+                    "name": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"color\":\"white alWite\",\n  \"quantity\":\"111\"\n}",
+                "form": []
+            },
+            "tests": []
+        },
+        {
+            "_id": "f453c6ab-5803-42a8-9fe4-73da79250dab",
+            "colId": "6bb231b2-7742-4537-a3f2-fa4de582f985",
+            "containerId": "96036c1a-3490-4b1e-a877-7410b096265d",
+            "name": "add",
+            "url": "{{eurl}}/api/products/productsize",
+            "method": "POST",
+            "sortNum": 180000,
+            "created": "2024-02-01T19:09:13.123Z",
+            "modified": "2024-02-01T19:18:29.126Z",
+            "headers": [
+                {
+                    "name": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"color\":\"green\",\n  \"quantity\": 432,\n  \"ProductId\": 4,\n  \"SizeId\": 1\n}",
+                "form": []
+            },
+            "tests": []
+        },
+        {
+            "_id": "6c91066a-8b08-45c1-a39c-d7d6bc02140b",
+            "colId": "6bb231b2-7742-4537-a3f2-fa4de582f985",
+            "containerId": "96036c1a-3490-4b1e-a877-7410b096265d",
+            "name": "delete",
+            "url": "{{eurl}}/api/products/productsize/79898",
+            "method": "DELETE",
+            "sortNum": 190000,
+            "created": "2024-02-01T19:23:50.803Z",
+            "modified": "2024-02-01T19:26:11.116Z",
+            "headers": [
+                {
+                    "name": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                }
+            ],
+            "params": [],
+            "tests": []
+        },
+        {
+            "_id": "84a088e8-af50-42f2-8218-e88be42f48b8",
+            "colId": "6bb231b2-7742-4537-a3f2-fa4de582f985",
+            "containerId": "fb7ed203-bfdc-49d0-b9ef-0fe94b6cfc32",
+            "name": "add",
+            "url": "",
+            "method": "GET",
+            "sortNum": 200000,
+            "created": "2024-02-02T07:08:02.874Z",
+            "modified": "2024-02-02T07:08:02.874Z",
+            "headers": []
+        },
+        {
+            "_id": "428ebbf0-856b-48a7-abdd-688095342fb3",
+            "colId": "6bb231b2-7742-4537-a3f2-fa4de582f985",
+            "containerId": "fb7ed203-bfdc-49d0-b9ef-0fe94b6cfc32",
+            "name": "delete",
+            "url": "{{eurl}}/api/productimage",
+            "method": "DELETE",
+            "sortNum": 210000,
+            "created": "2024-02-02T07:45:13.459Z",
+            "modified": "2024-02-02T07:55:46.750Z",
+            "headers": [
+                {
+                    "name": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"imageUrl\":\"16.png\",\n  \"ProductId\": 1\n}",
+                "form": []
+            },
+            "tests": []
+        }
+    ]
+}

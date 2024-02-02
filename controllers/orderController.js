@@ -1,39 +1,47 @@
 import asyncHandler from "express-async-handler";
 import { sequelize } from "../models/index.js";
 import ORDER_STATUS from "../constants/ORDER_STATUS.js";
-const { CREATED, SERVER_ERROR, NOT_FOUND, SUCCESS, UNAUTHORIZED, FORBIDDEN } = ORDER_STATUS;
+import STATUS_CODES from "../constants/STATUS_CODES.js";
+const { CREATED, SERVER_ERROR, NOT_FOUND, SUCCESS, UNAUTHORIZED, FORBIDDEN } =
+  STATUS_CODES;
 
-const {SHIPPED} = ORDER_STATUS;
+const { SHIPPED } = ORDER_STATUS;
 
 const checkOrderRequirements = async (products) => {
-  if (!products || products.length === 0) {
-    throw new Error("At least one product is required!");
-  }
-
   // Check if all products exist and have sufficient stock
   const productsWithStock = await Promise.all(
     products.map(async (product) => {
-      const { productId, quantity } = product;
+      const { ProductId, SizeId, quantity, color } = product;
 
       // Use findOne to check if the product exists and has sufficient stock
-      const existingProduct = await sequelize.models.Product.findOne({
+      const existingProductSize = await sequelize.models.ProductSize.findOne({
         where: {
-          id: productId,
-          stockQuantity: {
-            [sequelize.models.Sequelize.Op.gte]: quantity,
+          ProductId,
+          SizeId,
+          color,
+          quantity: {
+            [sequelize.Sequelize.Op.gte]: quantity,
           },
         },
       });
 
-      if (!existingProduct) {
+      if (!existingProductSize) {
         throw new Error(
-          `Product with ID ${productId} does not exist or has insufficient stock!`
+          `Product with ID ${ProductId} does not exist or has insufficient stock, color , size!`
         );
       }
 
+      const existingProduct = await sequelize.models.Product.findByPk(
+        ProductId
+      );
+
       return {
-        productId: existingProduct.id,
+        ProductId,
+        ProductSizeId: existingProductSize.id,
+        SizeId,
+        color,
         quantity,
+        product_price: existingProduct.price,
       };
     })
   );
@@ -42,75 +50,85 @@ const checkOrderRequirements = async (products) => {
 };
 
 const createOrderItems = async (order, productsWithStock, transaction) => {
-  for (const [index, product] of productsWithStock.entries()) {
-    const { productId, quantity } = productsWithStock[index];
-
-    // Get the product price
-    const productPrice = product.price;
+  for (let i = 0; i < productsWithStock.length; i++) {
+    const { ProductSizeId, quantity, product_price } = productsWithStock[i];
 
     // Calculate the subtotal
-    const subtotal = productPrice * quantity;
+    const subtotal = product_price * quantity;
 
     // Create order item
     await sequelize.models.OrderItem.create(
       {
-        orderId: order.id,
-        productId,
+        OrderId: order.id,
+        ProductSizeId,
         quantity,
-        price: productPrice,
-        subtotal, // Include the calculated subtotal
+        subtotal,
       },
       { transaction }
     );
   }
 };
 
-const decrementProductStock = async (productId, quantity, transaction) => {
-  // Decrement the stockQuantity of the product
-  await sequelize.models.Product.decrement("stockQuantity", {
+const decrementProductSizeStock = async (
+  ProductSizeId,
+  quantity,
+  transaction
+) => {
+  await sequelize.models.ProductSize.decrement("quantity", {
     by: quantity,
-    where: { id: productId },
+    where: { id: ProductSizeId },
     transaction,
   });
 };
 
+const calcTotalPrice = (products) => {
+  let price = 0;
+  for (let i = 0; i < products.length; i++) {
+    price += +products[i].product_price * +products[i].quantity;
+  }
+  return price;
+};
+
 const addOrder = asyncHandler(async (req, res) => {
-  const { orderDate, totalAmount, products } = req.body;
-  const userId = req.user.id;
+  const {
+    products,
+    shipping_address: { city, town, street },
+  } = req.body;
+
+  const UserId = req.user.id;
 
   try {
-    // Use the build method to create a new order instance without saving it to the database
-    const newOrder = await sequelize.models.Order.build({
-      orderDate,
-      totalAmount,
-      userId,
-    });
-
-    // Check order requirements
     const productsWithStock = await checkOrderRequirements(products);
 
+    let order;
     // Create order items and save the order
-    await sequelize.models.sequelize.transaction(async (t) => {
+    await sequelize.transaction(async (t) => {
       // Save the order to the database
-      await newOrder.save({ transaction: t });
+      order = await sequelize.models.Order.create(
+        {
+          UserId,
+          shipping_address: `city:${city},town:${town},street:${street}`,
+          total_amount: calcTotalPrice(productsWithStock),
+        },
+        { transaction: t }
+      );
 
       // Create order items
-      await createOrderItems(newOrder, productsWithStock, t);
+      await createOrderItems(order, productsWithStock, t);
 
       // Decrement product stock
       for (const [index, product] of productsWithStock.entries()) {
-        const { productId, quantity } = productsWithStock[index];
-        await decrementProductStock(productId, quantity, t);
+        const { quantity, ProductSizeId } = productsWithStock[index];
+        await decrementProductSizeStock(ProductSizeId, quantity, t);
       }
     });
 
     return res.status(CREATED).json({
       message: "Order added successfully",
-      order: newOrder,
+      order,
     });
   } catch (error) {
     console.error("Error adding new order:", error);
-
     // Send detailed error message to the client
     return res.status(SERVER_ERROR).json({
       message: "Internal Server Error",
@@ -128,9 +146,7 @@ const updateOrderStatus = asyncHandler(async (req, res) => {
 
     // If the order doesn't exist
     if (!order) {
-      return res
-        .status(NOT_FOUND)
-        .json({ message: "Order not found" });
+      return res.status(NOT_FOUND).json({ message: "Order not found" });
     }
 
     // Update the status field
@@ -145,9 +161,7 @@ const updateOrderStatus = asyncHandler(async (req, res) => {
     });
   } catch (error) {
     console.error("Error updating order status:", error);
-    return res
-      .status(SERVER_ERROR)
-      .json({ message: "Internal Server Error" });
+    return res.status(SERVER_ERROR).json({ message: "Internal Server Error" });
   }
 });
 
@@ -170,9 +184,7 @@ const getAllOrders = asyncHandler(async (req, res) => {
     });
   } catch (error) {
     console.error("Error getting all orders:", error);
-    return res
-      .status(SERVER_ERROR)
-      .json({ message: "Internal Server Error" });
+    return res.status(SERVER_ERROR).json({ message: "Internal Server Error" });
   }
 });
 
@@ -198,9 +210,7 @@ const getMyOrders = asyncHandler(async (req, res) => {
     });
   } catch (error) {
     console.error("Error retrieving orders:", error);
-    res
-      .status(SERVER_ERROR)
-      .json({ message: "Internal Server Error" });
+    res.status(SERVER_ERROR).json({ message: "Internal Server Error" });
   }
 });
 
@@ -216,9 +226,7 @@ const deleteOrder = asyncHandler(async (req, res) => {
 
     // If the order is not found
     if (!order) {
-      return res
-        .status(NOT_FOUND)
-        .json({ message: "Order not found" });
+      return res.status(NOT_FOUND).json({ message: "Order not found" });
     }
 
     // Check if the user is the owner of the order or isAdmin
@@ -237,9 +245,7 @@ const deleteOrder = asyncHandler(async (req, res) => {
     });
   } catch (error) {
     console.error("Error deleting order:", error);
-    res
-      .status(SERVER_ERROR)
-      .json({ message: "Internal Server Error" });
+    res.status(SERVER_ERROR).json({ message: "Internal Server Error" });
   }
 });
 
@@ -310,13 +316,11 @@ const cancelOrder = asyncHandler(async (req, res) => {
     });
   } catch (error) {
     console.error("Error canceling order:", error);
-    return res
-      .status(SERVER_ERROR)
-      .json({ message: "Internal Server Error" });
+    return res.status(SERVER_ERROR).json({ message: "Internal Server Error" });
   }
 });
 
-export  {
+export {
   addOrder,
   updateOrderStatus,
   getAllOrders,
