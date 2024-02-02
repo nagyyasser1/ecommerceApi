@@ -1,4 +1,4 @@
-import dotenv from "dotenv"
+import dotenv from "dotenv";
 dotenv.config();
 import express, { json, urlencoded } from "express";
 const app = express();
@@ -12,8 +12,8 @@ import { serve, setup } from "swagger-ui-express";
 import swaggerJsDoc from "swagger-jsdoc";
 import swaggerOpt from "./config/swaggerOpt.js";
 import { sequelize } from "./models/index.js";
-import { join, dirname } from 'path';
-import { fileURLToPath } from 'url';
+import { join, dirname } from "path";
+import { fileURLToPath } from "url";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -21,25 +21,28 @@ const __dirname = dirname(__filename);
 const PORT = process.env.PORT || 3500;
 
 // Setup Useful Middlewares
-app.use(logger); //log every request 
-app.use(cors(corsOptions)); //allow only specific origins 
-app.use(json());  //parse application/json 
-app.use(urlencoded({ extended: true }));   //parse form data
+app.use(logger); //log every request
+app.use(cors(corsOptions)); //allow only specific origins
+app.use(json()); //parse application/json
+app.use(urlencoded({ extended: true })); //parse form data
 app.use(cookieParser());
 
 // Serve statatic files on specific path
 app.use("/", express.static(join(__dirname, "uploads")));
 
-app.get('/add', (req,res)=>{
-  res.sendFile(join(__dirname+"/views"+'/addProduct.html'));
-})
+app.get("/addproduct", (req, res) => {
+  res.sendFile(join(__dirname + "/views" + "/addProduct.html"));
+});
+
+app.get("/addimage", (req, res) => {
+  res.sendFile(join(__dirname + "/views" + "/addImage.html"));
+});
 
 // Import Routes
-import route from "./routes/route.js"
-import authRoutes from "./routes/authRoutes.js"
-import apiRoutes from "./routes/apiRoutes.js"
-import contactRoutes from "./routes/contactRoutes.js"
-
+import route from "./routes/route.js";
+import authRoutes from "./routes/authRoutes.js";
+import apiRoutes from "./routes/apiRoutes.js";
+import contactRoutes from "./routes/contactRoutes.js";
 
 // Api routes
 app.use("/", route); // api welcome page
@@ -56,7 +59,7 @@ app.all("*", notFound);
 app.use(errorHandler);
 
 // Init db & Run the server
-sequelize.sync({alter: true}).then(() => {
+sequelize.sync({ alter: true }).then(() => {
   app.listen(PORT, () => {
     console.log(`server runing on port ${PORT}`);
   });
