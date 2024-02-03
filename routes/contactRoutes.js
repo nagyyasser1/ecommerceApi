@@ -1,7 +1,8 @@
-import transporter from "../config/transporter.js";
 import verifyJWT from "../middlewares/verifyJWT.js";
 import STATUS_CODES from "../constants/STATUS_CODES.js";
 import { Router } from "express";
+import sendEmail from "../utils/sendMail.js";
+import htmlContent from "../utils/htmlContent.js";
 const router = Router();
 
 /**
@@ -67,9 +68,9 @@ router.post("/", verifyJWT, (req, res) => {
   const { name, email, message, subject } = req.body;
 
   if (!name || !email || !message || !subject) {
-    return res
-      .status(STATUS_CODES.BAD_REQUEST)
-      .json({ message: "All fileds are required! {name,email,message,subject}" });
+    return res.status(STATUS_CODES.BAD_REQUEST).json({
+      message: "All fields are required! {name, email, message, subject}",
+    });
   }
 
   // Set up email options
@@ -78,18 +79,18 @@ router.post("/", verifyJWT, (req, res) => {
     to: process.env.MY_EMAIL,
     subject: subject,
     text: message,
+    html: htmlContent({ name, email, subject, message }),
   };
 
-  // Send the email
-  transporter.sendMail(mailOptions, (error, info) => {
-    if (error) {
-      console.error("Error:", error);
-      res.status(500).json({ success: false, error: "Internal Server Error" });
-    } else {
-      console.log("Email sent:", info.response);
+  sendEmail(mailOptions)
+    .then((response) => {
+      console.log("Email sent:", response);
       res.json({ success: true, message: "Message sent successfully" });
-    }
-  });
+    })
+    .catch((err) => {
+      console.error("Error:", err);
+      res.status(500).json({ success: false, error: "Internal Server Error" });
+    });
 });
 
 export default router;
