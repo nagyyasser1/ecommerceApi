@@ -101,7 +101,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Contact
 
-For inquiries or assistance, please contact us at your-email@gmail.com.
+For inquiries or assistance, please contact us at nagyy8751@gmail.com.
 
 Feel free to explore the code, raise issues, and contribute to the development of EcommerceAPI! Happy coding!
 
