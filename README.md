@@ -1,6 +1,6 @@
 # EcommerceAPI
 
-![EcommerceAPI Logo](link_to_logo_image.png)
+![EcommerceAPI Logo](https://imgs.search.brave.com/sfAuUaG5iJ01KJv9KbuCwgGOrLv9ZIdfp48TTr8lSrQ/rs:fit:500:0:0/g:ce/aHR0cHM6Ly91cGxv/YWQud2lraW1lZGlh/Lm9yZy93aWtpcGVk/aWEvY29tbW9ucy85/LzkwL0NvbWVyY2lv/X2VsZWN0cm9uaWNv/LmpwZw)
 
 EcommerceAPI is an open-source Node.js application that empowers small businesses to effortlessly manage and sell their clothing products online. This API provides a comprehensive set of features for handling products, orders, sizes, categories, reviews, and seamless communication with customers via email.
 
