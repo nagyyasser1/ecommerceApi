@@ -47,7 +47,22 @@ EcommerceAPI is an open-source Node.js application that empowers small businesse
 1. Clone the repository:
    
 ```bash
-   git clone https://github.com/your-username/ecommerce-api.git
+   git clone https://github.com/nagyyasser1/ecommerceApi.git
+```
+2. Navigate to the project directory:
+
+```bash
+  cd ecommerce-api
+```
+3. Install dependencies:
+
+```bash
+  npm install
+```
+
+4. Run the application:
+```bash
+  npm start
 ```
 
 
@@ -67,14 +82,14 @@ For detailed API documentation, refer to the [API Documentation](link_to_api_doc
 
 ## Dependencies
 
-List the major dependencies for your project and their versions.
+List the major dependencies for your project .
 
-- Node.js (version x.x.x)
-- Express (version x.x.x)
-- Postgres (version x.x.x)
-- Sequelize (version x.x.x)
-- Nodemailer (version x.x.x)
-- Jsonwebtoken (version x.x.x)
+- Node.js
+- Express
+- Postgres 
+- Sequelize 
+- Nodemailer 
+- Jsonwebtoken 
 
 ## Contributing
 
